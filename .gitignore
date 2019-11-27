@@ -1,0 +1,5 @@
+*.pyc
+/docs
+/llvm
+*Test*
+settings.json
