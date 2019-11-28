@@ -87,13 +87,14 @@ class Parser():
         for cmd in arithmetic:
             line = line.replace(cmd, arithmetic[cmd])
 
-            for reg in registers:
-                if (reg + '\n') in line:
-                    line = line.replace((reg + '\n'), registers[reg])
-                elif (reg + ',') in line:
-                    line = line.replace((reg + ','), registers[reg])
-            if ' ' in line:
-                line = line.replace(' ', '')
+        for reg in registers:
+            if (reg + '\n') in line:
+                line = line.replace((reg + '\n'), registers[reg])
+            elif (reg + ',') in line:
+                line = line.replace((reg + ','), registers[reg])
+
+        if ' ' in line:
+            line = line.replace(' ', '')
 
         self.__checkLine(line)
 
@@ -103,13 +104,14 @@ class Parser():
         for cmd in storage:
             line = line.replace(cmd, storage[cmd])
 
-            for reg in registers:
-                if ('(' + reg + ')\n') in line:
-                    line = line.replace(('(' + reg + ')\n'), registers[reg])
-                elif (reg + ',') in line:
-                    line = line.replace((reg + ','), registers[reg])
-            if ' ' in line:
-                line = line.replace(' ', '')
+        for reg in registers:
+            if ('(' + reg + ')\n') in line:
+                line = line.replace(('(' + reg + ')\n'), registers[reg])
+            elif (reg + ',') in line:
+                line = line.replace((reg + ','), registers[reg])
+
+        if ' ' in line:
+            line = line.replace(' ', '')
 
         self.__checkLine(line)
 
@@ -119,15 +121,15 @@ class Parser():
         for cmd in branch:
             line = line.replace(cmd, branch[cmd])
 
-            offset = line.split(',')[-1]
-            line = line.replace(offset, '{:016b}'.format(int(offset)))
+        offset = line.split(',')[-1]
+        line = line.replace(offset, '{:016b}'.format(int(offset)))
 
-            for reg in registers:
-                if (reg + ',') in line:
-                    line = line.replace((reg + ','), registers[reg])
+        for reg in registers:
+            if (reg + ',') in line:
+                line = line.replace((reg + ','), registers[reg])
 
-            if ' ' in line:
-                line = line.replace(' ', '')
+        if ' ' in line:
+            line = line.replace(' ', '')
 
         self.__checkLine(line)
 
