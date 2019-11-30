@@ -1,16 +1,6 @@
-# python assembler
-import logging
-import json
-import sys
-import os
-from resource_manager import ResourceManager
-from fileio import FileIO
+class Compiler():
+    """Compiler class"""
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-logger = logging.getLogger("[assembler]")
-
-
-class Parser():
     def __init__(self):
         self.delimiters = ['(', ')', ',']
 
@@ -116,19 +106,3 @@ class Parser():
         self.__checkLine(machine_code)
 
         return [machine_code]
-
-
-def main(args):
-    cfg = FileIO.read_json('config.json')
-    code = FileIO.read_code(args[0])
-
-    parser = Parser()
-    machine_code = parser.parse(
-        code, commands=cfg['commands'], registers=cfg['registers'])
-
-    with ResourceManager(args[1], 'w') as output_file:
-        output_file.write(machine_code)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
