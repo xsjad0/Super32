@@ -1,5 +1,5 @@
-class Compiler():
-    """Compiler class"""
+class Assembler():
+    """Assembler class"""
 
     def __init__(self):
         self.delimiters = ['(', ')', ',']
