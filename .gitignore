@@ -3,3 +3,5 @@
 /llvm
 *Test*
 settings.json
+/.local
+*.o

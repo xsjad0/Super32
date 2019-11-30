@@ -3,52 +3,11 @@ import logging
 import json
 import sys
 import os
+from resource_manager import ResourceManager
+from fileio import FileIO
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 logger = logging.getLogger("[assembler]")
-
-
-class Manager(object):
-    """Context manager class to handle system ressources"""
-
-    def __init__(self, filename, mode):
-        self.filename = filename
-        self.mode = mode
-
-    def __enter__(self):
-        try:
-            self.open_file = open(self.filename, self.mode)
-        except FileNotFoundError:
-            raise FileNotFoundError
-        else:
-            return self.open_file
-
-    def __exit__(self, *args):
-        self.open_file.close()
-
-
-def read_json(path):
-    try:
-        with Manager(path, "r") as file:
-            cfg = json.load(file)
-            logger.info("config file loaded")
-            return cfg
-
-    except FileNotFoundError:
-        logger.error("config file not found")
-        sys.exit(-1)
-
-
-def read_code(path):
-    try:
-        with Manager(path, "r") as file:
-            code = file.readlines()
-            logger.info("code file loaded")
-            return code
-
-    except FileNotFoundError:
-        logger.error("code file not found")
-        sys.exit(-1)
 
 
 class Parser():
@@ -72,7 +31,6 @@ class Parser():
             else:
                 raise Exception("parse error command")
 
-        joind = ''.join(bitcode)
         return ''.join(bitcode)
 
     def __checkLine(self, line):
@@ -96,7 +54,7 @@ class Parser():
         if ' ' in line:
             line = line.replace(' ', '')
 
-        self.__checkLine(line)
+        # self.__checkLine(line)
 
         return [line]
 
@@ -113,7 +71,7 @@ class Parser():
         if ' ' in line:
             line = line.replace(' ', '')
 
-        self.__checkLine(line)
+        # self.__checkLine(line)
 
         return [line]
 
@@ -131,20 +89,20 @@ class Parser():
         if ' ' in line:
             line = line.replace(' ', '')
 
-        self.__checkLine(line)
+        # self.__checkLine(line)
 
         return [line]
 
 
 def main(args):
-    cfg = read_json('config.json')
-    code = read_code(args[0])
+    cfg = FileIO.read_json('config.json')
+    code = FileIO.read_code(args[0])
 
     parser = Parser()
     machine_code = parser.parse(
         code, commands=cfg['commands'], registers=cfg['registers'])
 
-    with Manager(args[1], 'w') as output_file:
+    with ResourceManager(args[1], 'w') as output_file:
         output_file.write(machine_code)
 
 
