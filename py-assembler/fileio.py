@@ -1,5 +1,6 @@
 import logging
 import json
+import sys
 from resource_manager import ResourceManager
 
 logger = logging.getLogger("[assembler]")
@@ -28,7 +29,7 @@ class FileIO:
 
         try:
             with ResourceManager(path, "r") as file:
-                code = file.readlines()
+                code = file.read().splitlines()
                 logger.info("code file loaded")
                 return code
 
