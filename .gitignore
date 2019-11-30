@@ -1,7 +1,8 @@
 *.pyc
-/docs
 /llvm
 *Test*
 settings.json
 /.local
 *.o
+*.pdf
+
