@@ -13,6 +13,7 @@
             "cwd": "${fileDirname}",
             "args": [
                 "input.txt",
+                "-o",
                 "output.o"
             ]
         }

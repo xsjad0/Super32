@@ -1,4 +1,5 @@
 # python assembler
+import argparse
 import logging
 import json
 import sys
@@ -13,15 +14,25 @@ logger = logging.getLogger("[assembler]")
 
 def main(args):
     cfg = FileIO.read_json('config.json')
-    code = FileIO.read_code(args[0])
+    code = FileIO.read_code(args.input)
 
     assembler = Assembler()
     machine_code = assembler.parse(
         code, commands=cfg['commands'], registers=cfg['registers'])
 
-    with ResourceManager(args[1], 'w') as output_file:
+    with ResourceManager(args.output, 'w') as output_file:
         output_file.write(machine_code)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    argparser = argparse.ArgumentParser(description='Super32 assembly parser')
+    argparser.add_argument('input',
+                           help='path to assembler file')
+    argparser.add_argument('-o', '--output', metavar='output-file',
+                           help='path to generated machinecode file')
+    args = argparser.parse_args()
+
+    if (args.output == None):
+        args.output = 'output.o'
+
+    main(args)
