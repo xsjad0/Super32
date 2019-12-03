@@ -7,12 +7,11 @@ import os
 from resource_manager import ResourceManager
 from fileio import FileIO
 from assembler import Assembler
-
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-logger = logging.getLogger("[assembler]")
+from settings import Settings
 
 
 def main(args):
+    Settings.load()
     cfg = FileIO.read_json('config.json')
     code = FileIO.read_code(args.input)
 
