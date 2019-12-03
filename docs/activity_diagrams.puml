@@ -1,0 +1,42 @@
+@startuml
+
+start
+:Read\ninput-file;
+:iterate\nthrough\nlines;
+while (more lines?) is (yes)
+    :replace delimiters\nwith spaces;
+    note right
+        example:
+        ['ADD R1,R2,R3'] ... ['ADD R1 R2 R3']
+    end note
+    :split line\ninto tokens;
+    note right
+        example:
+        ADD R1 R2 R3 ... ['ADD', 'R1', 'R2', 'R3']
+    end note
+    if (line empty?) then (yes)
+        :do nothing;
+    elseif (arithmetic cmd?) then
+        :replace commands\nwith machinecode;
+        :replace registers\nwith machinecode;
+        :add dont-care-bits\nand op-code\n(always zero);
+        :rearrenge\nmachincode;
+    elseif (storage cmd?) then
+        :resize token-list;
+        :replace commands\nwith machinecode;
+        :replace registers\nwith machinecode;
+        :replace int-offset\nby binary-offset;
+        :rearrenge\nmachincode;
+    elseif (branch cmd?) then
+        :replace commands\nwith machinecode;
+        :replace registers\nwith machinecode;
+        :replace int-offset\nby binary-offset;
+        :rearrenge\nmachincode;
+    endif
+endwhile (no)
+:validate\nline-length\n(always 32!);
+:validate\nmachincode\n(contains 0 and 1);
+:write\nmachinecode\nto output-file;
+stop
+
+@enduml

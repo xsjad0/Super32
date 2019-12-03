@@ -1,110 +1,132 @@
-# python assembler
 import logging
-import json
-import sys
-import os
-from resource_manager import ResourceManager
-from fileio import FileIO
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-logger = logging.getLogger("[assembler]")
+logger = logging.getLogger('[assembler]')
 
 
-class Parser():
+class Assembler():
+    """Assembler class"""
+
     def __init__(self):
-        pass
+        self.delimiters = ['(', ')', ',']
 
     def parse(self, code, commands, registers):
         bitcode = []
         for line in code:
-            if line == '\n':
+            logger.debug(str(line))
+            for delimiter in self.delimiters:
+                line = line.replace(delimiter, ' ')
+            tokens = line.split(' ')
+            if len(tokens[0]) == 0:
                 continue
-            elif line.split(' ')[0] in commands['arithmetic']:
+            elif tokens[0] in commands['arithmetic']:
                 bitcode = bitcode + self.__parseArithmetic(
-                    line, commands['arithmetic'], registers)
-            elif line.split(' ')[0] in commands['storage']:
+                    tokens, commands['arithmetic'], registers)
+            elif tokens[0] in commands['storage']:
                 bitcode = bitcode + self.__parseStorage(
-                    line, commands['storage'], registers)
-            elif line.split(' ')[0] in commands['branch']:
+                    tokens, commands['storage'], registers)
+            elif tokens[0] in commands['branch']:
                 bitcode = bitcode + \
-                    self.__parseBranch(line, commands['branch'], registers)
+                    self.__parseBranch(tokens, commands['branch'], registers)
             else:
-                raise Exception("parse error command")
+                raise Exception(
+                    "Parsing error. Command not found: " + tokens[0])
 
         return ''.join(bitcode)
 
-    def __checkLine(self, line):
-        if len(line) != 32:
+    def __validateCodeLength(self, machine_code):
+        if len(machine_code) != 32:
             raise Exception('Parsing error')
 
-        for bit in line:
-            if bit not in [0, 1]:
+    def __validateTokenLength(self, tokens):
+        if len(tokens) != 4:
+            raise Exception('Parsing error')
+
+    def __validateBits(self, machine_code):
+        for bit in machine_code:
+            if bit not in ['0', '1']:
                 raise Exception('Parsing error')
 
-    def __parseArithmetic(self, line, arithmetic, registers):
+    def __parseArithmetic(self, tokens, arithmetic, registers):
+        self.__validateTokenLength(tokens)
         for cmd in arithmetic:
-            line = line.replace(cmd, arithmetic[cmd])
+            for i, token in enumerate(tokens):
+                if token == cmd:
+                    tokens[i] = arithmetic[cmd]
+                    break
 
         for reg in registers:
-            if (reg + '\n') in line:
-                line = line.replace((reg + '\n'), registers[reg])
-            elif (reg + ',') in line:
-                line = line.replace((reg + ','), registers[reg])
+            for i, token in enumerate(tokens):
+                if token == reg:
+                    tokens[i] = registers[reg]
 
-        if ' ' in line:
-            line = line.replace(' ', '')
+        self.__validateBits(''.join(tokens))
 
-        # self.__checkLine(line)
+        # add 5bit dont-cares and 6bit op-code always zero
+        tokens = tokens + ['00000'] + ['000000']
 
-        return [line]
+        # rearrenge bit-order
+        order = [5, 2, 3, 1, 4, 0]
+        tokens = [tokens[i] for i in order]
 
-    def __parseStorage(self, line, storage, registers):
+        machine_code = ''.join(tokens)
+        self.__validateCodeLength(machine_code)
+
+        logger.debug(machine_code)
+        return [machine_code]
+
+    def __parseStorage(self, tokens, storage, registers):
+        tokens = tokens[:-1]
+        self.__validateTokenLength(tokens)
         for cmd in storage:
-            line = line.replace(cmd, storage[cmd])
+            for i, token in enumerate(tokens):
+                if token == cmd:
+                    tokens[i] = storage[cmd]
+                    break
 
         for reg in registers:
-            if ('(' + reg + ')\n') in line:
-                line = line.replace(('(' + reg + ')\n'), registers[reg])
-            elif (reg + ',') in line:
-                line = line.replace((reg + ','), registers[reg])
+            for i, token in enumerate(tokens):
+                if token == reg:
+                    tokens[i] = registers[reg]
 
-        if ' ' in line:
-            line = line.replace(' ', '')
+        self.__validateBits(''.join(tokens))
 
-        # self.__checkLine(line)
+        offset = tokens[2]
+        tokens[2] = "{:016b}".format(int(offset))
 
-        return [line]
+        # rearrenge bit-order
+        order = [0, 3, 1, 2]
+        tokens = [tokens[i] for i in order]
 
-    def __parseBranch(self, line, branch, registers):
+        machine_code = ''.join(tokens)
+        self.__validateCodeLength(machine_code)
+
+        logger.debug(machine_code)
+        return [machine_code]
+
+    def __parseBranch(self, tokens, branch, registers):
+        self.__validateTokenLength(tokens)
         for cmd in branch:
-            line = line.replace(cmd, branch[cmd])
-
-        offset = line.split(',')[-1]
-        line = line.replace(offset, '{:016b}'.format(int(offset)))
+            for i, token in enumerate(tokens):
+                if token == cmd:
+                    tokens[i] = branch[cmd]
+                    break
 
         for reg in registers:
-            if (reg + ',') in line:
-                line = line.replace((reg + ','), registers[reg])
+            for i, token in enumerate(tokens):
+                if token == reg:
+                    tokens[i] = registers[reg]
 
-        if ' ' in line:
-            line = line.replace(' ', '')
+        self.__validateBits(''.join(tokens))
 
-        # self.__checkLine(line)
+        offset = tokens[3]
+        tokens[3] = "{:016b}".format(int(offset))
 
-        return [line]
+        # rearrenge bit-order
+        order = [0, 2, 1, 3]
+        tokens = [tokens[i] for i in order]
 
+        machine_code = ''.join(tokens)
+        self.__validateCodeLength(machine_code)
 
-def main(args):
-    cfg = FileIO.read_json('config.json')
-    code = FileIO.read_code(args[0])
-
-    parser = Parser()
-    machine_code = parser.parse(
-        code, commands=cfg['commands'], registers=cfg['registers'])
-
-    with ResourceManager(args[1], 'w') as output_file:
-        output_file.write(machine_code)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
+        logger.debug(machine_code)
+        return [machine_code]
