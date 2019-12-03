@@ -32,6 +32,6 @@ if __name__ == "__main__":
     args = argparser.parse_args()
 
     if (args.output == None):
-        args.output = 'output.o'
+        args.output = args.input.rsplit('.', 1)[0] + '.o'
 
     main(args)
