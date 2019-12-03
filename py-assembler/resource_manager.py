@@ -1,3 +1,9 @@
+import logging
+import sys
+
+logger = logging.getLogger("[assembler]")
+
+
 class ResourceManager(object):
     """Context manager class to handle system ressources"""
 
@@ -8,8 +14,9 @@ class ResourceManager(object):
     def __enter__(self):
         try:
             self.open_file = open(self.filename, self.mode)
-        except FileNotFoundError:
-            raise FileNotFoundError
+        except FileNotFoundError as e:
+            logger.error(e.strerror + ': ' + e.filename)
+            sys.exit(-1)
         else:
             return self.open_file
 

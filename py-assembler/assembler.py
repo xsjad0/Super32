@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger('[assembler]')
+
+
 class Assembler():
     """Assembler class"""
 
@@ -7,6 +12,7 @@ class Assembler():
     def parse(self, code, commands, registers):
         bitcode = []
         for line in code:
+            logger.debug(str(line))
             for delimiter in self.delimiters:
                 line = line.replace(delimiter, ' ')
             tokens = line.split(' ')
@@ -22,19 +28,26 @@ class Assembler():
                 bitcode = bitcode + \
                     self.__parseBranch(tokens, commands['branch'], registers)
             else:
-                raise Exception("parse error command")
+                raise Exception(
+                    "Parsing error. Command not found: " + tokens[0])
 
         return ''.join(bitcode)
 
-    def __checkLine(self, machine_code):
+    def __validateCodeLength(self, machine_code):
         if len(machine_code) != 32:
             raise Exception('Parsing error')
 
+    def __validateTokenLength(self, tokens):
+        if len(tokens) != 4:
+            raise Exception('Parsing error')
+
+    def __validateBits(self, machine_code):
         for bit in machine_code:
             if bit not in ['0', '1']:
                 raise Exception('Parsing error')
 
     def __parseArithmetic(self, tokens, arithmetic, registers):
+        self.__validateTokenLength(tokens)
         for cmd in arithmetic:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -46,6 +59,8 @@ class Assembler():
                 if token == reg:
                     tokens[i] = registers[reg]
 
+        self.__validateBits(''.join(tokens))
+
         # add 5bit dont-cares and 6bit op-code always zero
         tokens = tokens + ['00000'] + ['000000']
 
@@ -54,12 +69,14 @@ class Assembler():
         tokens = [tokens[i] for i in order]
 
         machine_code = ''.join(tokens)
-        self.__checkLine(machine_code)
+        self.__validateCodeLength(machine_code)
 
+        logger.debug(machine_code)
         return [machine_code]
 
     def __parseStorage(self, tokens, storage, registers):
         tokens = tokens[:-1]
+        self.__validateTokenLength(tokens)
         for cmd in storage:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -71,6 +88,8 @@ class Assembler():
                 if token == reg:
                     tokens[i] = registers[reg]
 
+        self.__validateBits(''.join(tokens))
+
         offset = tokens[2]
         tokens[2] = "{:016b}".format(int(offset))
 
@@ -79,11 +98,13 @@ class Assembler():
         tokens = [tokens[i] for i in order]
 
         machine_code = ''.join(tokens)
-        self.__checkLine(machine_code)
+        self.__validateCodeLength(machine_code)
 
+        logger.debug(machine_code)
         return [machine_code]
 
     def __parseBranch(self, tokens, branch, registers):
+        self.__validateTokenLength(tokens)
         for cmd in branch:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -95,6 +116,8 @@ class Assembler():
                 if token == reg:
                     tokens[i] = registers[reg]
 
+        self.__validateBits(''.join(tokens))
+
         offset = tokens[3]
         tokens[3] = "{:016b}".format(int(offset))
 
@@ -103,6 +126,7 @@ class Assembler():
         tokens = [tokens[i] for i in order]
 
         machine_code = ''.join(tokens)
-        self.__checkLine(machine_code)
+        self.__validateCodeLength(machine_code)
 
+        logger.debug(machine_code)
         return [machine_code]
