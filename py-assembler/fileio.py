@@ -26,3 +26,9 @@ class FileIO:
             code = file.read().splitlines()
             logger.debug("code file loaded")
             return code
+
+    @staticmethod
+    def write(path, content):
+        with ResourceManager(path, "w") as file:
+            file.write(content)
+            logger.debug("wrote file")

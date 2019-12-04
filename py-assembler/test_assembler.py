@@ -13,32 +13,32 @@ def test_parse_add():
     result = assembler.parse(
         ['ADD R1,R20,R12'], commands=cfg['commands'], registers=cfg['registers'])
 
-    assert result == "00000010100011000000100000000010"
+    assert result == ["00000010100011000000100000000010"]
 
 
 def test_parse_sub():
     result = assembler.parse(
         ['SUB R2,R1,R4'], commands=cfg['commands'], registers=cfg['registers'])
 
-    assert result == "00000000001001000001000000000110"
+    assert result == ["00000000001001000001000000000110"]
 
 
 def test_parse_lw():
     result = assembler.parse(
         ['LW R1,0(R2)'], commands=cfg['commands'], registers=cfg['registers'])
 
-    assert result == "10001100010000010000000000000000"
+    assert result == ["10001100010000010000000000000000"]
 
 
 def test_parse_sw():
     result = assembler.parse(
         ['SW R1,0(R2)'], commands=cfg['commands'], registers=cfg['registers'])
 
-    assert result == "10101100010000010000000000000000"
+    assert result == ["10101100010000010000000000000000"]
 
 
 def test_parse_beq():
     result = assembler.parse(
         ['BEQ R1,R2,0'], commands=cfg['commands'], registers=cfg['registers'])
 
-    assert result == "00010000010000010000000000000000"
+    assert result == ["00010000010000010000000000000000"]

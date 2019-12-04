@@ -31,7 +31,7 @@ class Assembler():
                 raise Exception(
                     "Parsing error. Command not found: " + tokens[0])
 
-        return ''.join(bitcode)
+        return bitcode
 
     def __validateCodeLength(self, machine_code):
         if len(machine_code) != 32:
