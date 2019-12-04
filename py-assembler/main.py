@@ -13,7 +13,7 @@ from generator import Generator
 
 def main(args):
     Settings.load()
-    cfg = FileIO.read_json('config.json')
+    cfg = FileIO.read_json('instructionset.json')
     code = FileIO.read_code(args.input)
 
     assembler = Assembler()

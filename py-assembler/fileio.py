@@ -24,6 +24,7 @@ class FileIO:
 
         with ResourceManager(path, "r") as file:
             code = file.read().splitlines()
+            code = [str.upper(line) for line in code]
             logger.debug("code file loaded")
             return code
 

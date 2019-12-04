@@ -37,8 +37,16 @@ def test_parse_sw():
     assert result == ["10101100010000010000000000000000"]
 
 
-def test_parse_beq():
+def test_parse_beq_imm():
     result = assembler.parse(
         ['BEQ R1,R2,0'], commands=cfg['commands'], registers=cfg['registers'])
+
+    assert result == ["00010000010000010000000000000000"]
+
+
+def test_parse_beq_label():
+    assembler.__dict__['_Assembler__symboltable'] = {'loop': 0}
+    result = assembler.parse(
+        ['BEQ R1,R2,loop'], commands=cfg['commands'], registers=cfg['registers'])
 
     assert result == ["00010000010000010000000000000000"]

@@ -1,4 +1,5 @@
 import logging
+from bitstring import Bits
 
 logger = logging.getLogger('[assembler]')
 
@@ -7,14 +8,19 @@ class Assembler():
     """Assembler class"""
 
     def __init__(self):
-        self.delimiters = ['(', ')', ',']
+        self.__delimiters = ['(', ')', ',']
+        self.__symboltable = {}
 
     def parse(self, code, commands, registers):
         bitcode = []
-        for line in code:
+
+        code = self.__generateSymboltable(code)
+
+        for line_nr, line in enumerate(code):
             logger.debug(str(line))
-            for delimiter in self.delimiters:
+            for delimiter in self.__delimiters:
                 line = line.replace(delimiter, ' ')
+            line = line.strip()
             tokens = line.split(' ')
             if len(tokens[0]) == 0:
                 continue
@@ -26,12 +32,38 @@ class Assembler():
                     tokens, commands['storage'], registers)
             elif tokens[0] in commands['branch']:
                 bitcode = bitcode + \
-                    self.__parseBranch(tokens, commands['branch'], registers)
+                    self.__parseBranch(
+                        line_nr, tokens, commands['branch'], registers)
             else:
                 raise Exception(
                     "Parsing error. Command not found: " + tokens[0])
 
         return bitcode
+
+    def __generateSymboltable(self, code):
+        """ builds a dictionary within keys are the lables
+        and values are the labels address.
+        returns code without labels."""
+
+        code_without_lables = []
+        for i, line in enumerate(code):
+            label_code = line.split(':')
+            label = label_code[0]
+            if len(label) != len(line):
+                self.__symboltable[label] = i
+                instruction = label_code.pop().strip()
+                code_without_lables = code_without_lables + [instruction]
+            else:
+                instruction = label_code.pop().strip()
+                code_without_lables = code_without_lables + [instruction]
+
+        return code_without_lables
+
+    def __validateLabel(self, label):
+        if label not in self.__symboltable.keys():
+            raise Exception("Label not found: " + label)
+        else:
+            return self.__symboltable.get(label)
 
     def __validateCodeLength(self, machine_code):
         if len(machine_code) != 32:
@@ -75,7 +107,6 @@ class Assembler():
         return [machine_code]
 
     def __parseStorage(self, tokens, storage, registers):
-        tokens = tokens[:-1]
         self.__validateTokenLength(tokens)
         for cmd in storage:
             for i, token in enumerate(tokens):
@@ -103,8 +134,28 @@ class Assembler():
         logger.debug(machine_code)
         return [machine_code]
 
-    def __parseBranch(self, tokens, branch, registers):
+    def __parseBranch(self, line_nr, tokens, branch, registers):
         self.__validateTokenLength(tokens)
+
+        if tokens[-1].isdecimal():
+            tokens = self.__parseBranchImmediate(tokens, branch, registers)
+        else:
+            tokens = self.__parseBranchLabel(
+                line_nr, tokens, branch, registers)
+
+        self.__validateBits(''.join(tokens))
+
+        # rearrenge bit-order
+        order = [0, 2, 1, 3]
+        tokens = [tokens[i] for i in order]
+
+        machine_code = ''.join(tokens)
+        self.__validateCodeLength(machine_code)
+
+        logger.debug(machine_code)
+        return [machine_code]
+
+    def __parseBranchImmediate(self, tokens, branch, registers):
         for cmd in branch:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -116,17 +167,28 @@ class Assembler():
                 if token == reg:
                     tokens[i] = registers[reg]
 
-        self.__validateBits(''.join(tokens))
+        offset = int(tokens[-1])
+        tokens[-1] = Bits(int=offset, length=16).bin
 
-        offset = tokens[3]
-        tokens[3] = "{:016b}".format(int(offset))
+        return tokens
 
-        # rearrenge bit-order
-        order = [0, 2, 1, 3]
-        tokens = [tokens[i] for i in order]
+    def __parseBranchLabel(self, line_nr, tokens, branch, registers):
+        address = self.__validateLabel(tokens[-1])
+        for cmd in branch:
+            for i, token in enumerate(tokens):
+                if token == cmd:
+                    tokens[i] = branch[cmd]
+                    break
 
-        machine_code = ''.join(tokens)
-        self.__validateCodeLength(machine_code)
+        for reg in registers:
+            for i, token in enumerate(tokens):
+                if token == reg:
+                    tokens[i] = registers[reg]
 
-        logger.debug(machine_code)
-        return [machine_code]
+        # negativ offset indicates to jump backwards
+        offset = address - line_nr
+        if offset < 0:
+            offset -= 1
+        tokens[-1] = Bits(int=offset, length=16).bin
+
+        return tokens
