@@ -24,7 +24,7 @@ For the Super32 project you need:
 To use the python assembler you must change directory to py-assembler and run main.py with python. To actually assemble code you have to provide an input file via argument.
 
 ```Bash
-cd py-assembler
+cd app
 python main.py input.txt
 ```
 

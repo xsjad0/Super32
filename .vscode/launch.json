@@ -8,10 +8,12 @@
       "name": "Python: Run main",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/py-assembler/main.py",
+      "program": "${workspaceFolder}/app/main.py",
       "console": "internalConsole",
       "cwd": "${fileDirname}",
-      "args": ["input.txt"]
+      "args": [
+        "input.txt"
+      ]
     }
   ]
 }

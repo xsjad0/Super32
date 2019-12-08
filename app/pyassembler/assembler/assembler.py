@@ -1,7 +1,7 @@
 import logging
 from bitstring import Bits
 
-logger = logging.getLogger('[assembler]')
+LOGGER = logging.getLogger('[assembler]')
 
 
 class Assembler():
@@ -17,7 +17,7 @@ class Assembler():
         code = self.__generateSymboltable(code)
 
         for line_nr, line in enumerate(code):
-            logger.debug(str(line))
+            LOGGER.debug(str(line))
             for delimiter in self.__delimiters:
                 line = line.replace(delimiter, ' ')
             line = line.strip()
@@ -103,7 +103,7 @@ class Assembler():
         machine_code = ''.join(tokens)
         self.__validateCodeLength(machine_code)
 
-        logger.debug(machine_code)
+        LOGGER.debug(machine_code)
         return [machine_code]
 
     def __parseStorage(self, tokens, storage, registers):
@@ -131,7 +131,7 @@ class Assembler():
         machine_code = ''.join(tokens)
         self.__validateCodeLength(machine_code)
 
-        logger.debug(machine_code)
+        LOGGER.debug(machine_code)
         return [machine_code]
 
     def __parseBranch(self, line_nr, tokens, branch, registers):
@@ -152,7 +152,7 @@ class Assembler():
         machine_code = ''.join(tokens)
         self.__validateCodeLength(machine_code)
 
-        logger.debug(machine_code)
+        LOGGER.debug(machine_code)
         return [machine_code]
 
     def __parseBranchImmediate(self, tokens, branch, registers):

@@ -1,9 +1,10 @@
+""" Input / Output Module """
+
 import logging
 import json
-import sys
-from resource_manager import ResourceManager
+from pyassembler.manager.resource_manager import ResourceManager
 
-logger = logging.getLogger("[assembler]")
+LOGGER = logging.getLogger("[assembler]")
 
 
 class FileIO:
@@ -15,7 +16,7 @@ class FileIO:
 
         with ResourceManager(path, "r") as file:
             cfg = json.load(file)
-            logger.debug("config file loaded")
+            LOGGER.debug("config file loaded")
             return cfg
 
     @staticmethod
@@ -25,11 +26,13 @@ class FileIO:
         with ResourceManager(path, "r") as file:
             code = file.read().splitlines()
             code = [str.upper(line) for line in code]
-            logger.debug("code file loaded")
+            LOGGER.debug("code file loaded")
             return code
 
     @staticmethod
     def write(path, content):
+        """ write machine-code to file """
+
         with ResourceManager(path, "w") as file:
             file.write(content)
-            logger.debug("wrote file")
+            LOGGER.debug("wrote file")

@@ -1,6 +1,6 @@
-from abc import ABCMeta, abstractclassmethod
-from resource_manager import ResourceManager
-from fileio import FileIO
+""" File format generator module """
+
+from pyassembler.inout.fileio import FileIO
 
 
 class Generator:
