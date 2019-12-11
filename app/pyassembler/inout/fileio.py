@@ -4,8 +4,6 @@ import logging
 import json
 from pyassembler.manager.resource_manager import ResourceManager
 
-LOGGER = logging.getLogger("[assembler]")
-
 
 class FileIO:
     """ File Input/Ouput class """
@@ -16,7 +14,7 @@ class FileIO:
 
         with ResourceManager(path, "r") as file:
             cfg = json.load(file)
-            LOGGER.debug("config file loaded")
+            logging.debug("config file loaded")
             return cfg
 
     @staticmethod
@@ -26,7 +24,7 @@ class FileIO:
         with ResourceManager(path, "r") as file:
             code = file.read().splitlines()
             code = [str.upper(line) for line in code]
-            LOGGER.debug("code file loaded")
+            logging.debug("code file loaded")
             return code
 
     @staticmethod
@@ -35,4 +33,4 @@ class FileIO:
 
         with ResourceManager(path, "w") as file:
             file.write(content)
-            LOGGER.debug("wrote file")
+            logging.debug("wrote file")

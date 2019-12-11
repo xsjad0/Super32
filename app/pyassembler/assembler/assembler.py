@@ -1,7 +1,11 @@
+"""
+Assembler Module
+"""
+
 import logging
 from bitstring import Bits
 
-LOGGER = logging.getLogger('[assembler]')
+REG_SIZE = 4  # bytes
 
 
 class Assembler():
@@ -11,36 +15,54 @@ class Assembler():
         self.__delimiters = ['(', ')', ',']
         self.__symboltable = {}
 
-    def parse(self, code, commands, registers):
+    def parse(self, code_address, code, zeros_constants, commands, registers):
         bitcode = []
 
-        code = self.__generateSymboltable(code)
+        zeros_constants = self.__generate_start(
+            code_address,
+            zeros_constants,
+            commands,
+            registers
+        )
+        code = self.__generate_symboltable(code)
 
         for line_nr, line in enumerate(code):
-            LOGGER.debug(str(line))
+            logging.debug(str(line))
             for delimiter in self.__delimiters:
                 line = line.replace(delimiter, ' ')
             line = line.strip()
             tokens = line.split(' ')
             if len(tokens[0]) == 0:
                 continue
-            elif tokens[0] in commands['arithmetic']:
-                bitcode = bitcode + self.__parseArithmetic(
+            if tokens[0] in commands['arithmetic']:
+                bitcode = bitcode + self.__parse_arithmetic(
                     tokens, commands['arithmetic'], registers)
             elif tokens[0] in commands['storage']:
-                bitcode = bitcode + self.__parseStorage(
+                bitcode = bitcode + self.__parse_storage(
                     tokens, commands['storage'], registers)
             elif tokens[0] in commands['branch']:
                 bitcode = bitcode + \
-                    self.__parseBranch(
+                    self.__parse_branch(
                         line_nr, tokens, commands['branch'], registers)
             else:
                 raise Exception(
                     "Parsing error. Command not found: " + tokens[0])
 
-        return bitcode
+        machine_code = self.__generate_machinecode(
+            code_address,
+            bitcode,
+            zeros_constants
+        )
+        return machine_code
 
-    def __generateSymboltable(self, code):
+    def __generate_machinecode(self, code_address, bitcode, zeros_constants):
+        index = int(code_address / REG_SIZE)
+        machine_code = zeros_constants[:]
+        for i, bitcode_line in enumerate(bitcode, index):
+            machine_code[i] = bitcode_line
+        return machine_code
+
+    def __generate_symboltable(self, code):
         """ builds a dictionary within keys are the lables
         and values are the labels address.
         returns code without labels."""
@@ -59,27 +81,27 @@ class Assembler():
 
         return code_without_lables
 
-    def __validateLabel(self, label):
+    def __validate_label(self, label):
         if label not in self.__symboltable.keys():
             raise Exception("Label not found: " + label)
         else:
             return self.__symboltable.get(label)
 
-    def __validateCodeLength(self, machine_code):
+    def __validate_code_length(self, machine_code):
         if len(machine_code) != 32:
             raise Exception('Parsing error')
 
-    def __validateTokenLength(self, tokens):
+    def __validate_token_length(self, tokens):
         if len(tokens) != 4:
             raise Exception('Parsing error')
 
-    def __validateBits(self, machine_code):
+    def __validate_bits(self, machine_code):
         for bit in machine_code:
             if bit not in ['0', '1']:
                 raise Exception('Parsing error')
 
-    def __parseArithmetic(self, tokens, arithmetic, registers):
-        self.__validateTokenLength(tokens)
+    def __parse_arithmetic(self, tokens, arithmetic, registers):
+        self.__validate_token_length(tokens)
         for cmd in arithmetic:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -91,7 +113,7 @@ class Assembler():
                 if token == reg:
                     tokens[i] = registers[reg]
 
-        self.__validateBits(''.join(tokens))
+        self.__validate_bits(''.join(tokens))
 
         # add 5bit dont-cares and 6bit op-code always zero
         tokens = tokens + ['00000'] + ['000000']
@@ -101,13 +123,13 @@ class Assembler():
         tokens = [tokens[i] for i in order]
 
         machine_code = ''.join(tokens)
-        self.__validateCodeLength(machine_code)
+        self.__validate_code_length(machine_code)
 
-        LOGGER.debug(machine_code)
+        logging.debug(machine_code)
         return [machine_code]
 
-    def __parseStorage(self, tokens, storage, registers):
-        self.__validateTokenLength(tokens)
+    def __parse_storage(self, tokens, storage, registers):
+        self.__validate_token_length(tokens)
         for cmd in storage:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -119,43 +141,43 @@ class Assembler():
                 if token == reg:
                     tokens[i] = registers[reg]
 
-        self.__validateBits(''.join(tokens))
+        self.__validate_bits(''.join(tokens))
 
-        offset = tokens[2]
-        tokens[2] = "{:016b}".format(int(offset))
+        offset = int(tokens[2])
+        tokens[2] = Bits(int=offset, length=16).bin
 
         # rearrenge bit-order
         order = [0, 3, 1, 2]
         tokens = [tokens[i] for i in order]
 
         machine_code = ''.join(tokens)
-        self.__validateCodeLength(machine_code)
+        self.__validate_code_length(machine_code)
 
-        LOGGER.debug(machine_code)
+        logging.debug(machine_code)
         return [machine_code]
 
-    def __parseBranch(self, line_nr, tokens, branch, registers):
-        self.__validateTokenLength(tokens)
+    def __parse_branch(self, line_nr, tokens, branch, registers):
+        self.__validate_token_length(tokens)
 
         if tokens[-1].isdecimal():
-            tokens = self.__parseBranchImmediate(tokens, branch, registers)
+            tokens = self.__parse_branch_immediate(tokens, branch, registers)
         else:
-            tokens = self.__parseBranchLabel(
+            tokens = self.__parse_branch_label(
                 line_nr, tokens, branch, registers)
 
-        self.__validateBits(''.join(tokens))
+        self.__validate_bits(''.join(tokens))
 
         # rearrenge bit-order
         order = [0, 2, 1, 3]
         tokens = [tokens[i] for i in order]
 
         machine_code = ''.join(tokens)
-        self.__validateCodeLength(machine_code)
+        self.__validate_code_length(machine_code)
 
-        LOGGER.debug(machine_code)
+        logging.debug(machine_code)
         return [machine_code]
 
-    def __parseBranchImmediate(self, tokens, branch, registers):
+    def __parse_branch_immediate(self, tokens, branch, registers):
         for cmd in branch:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -172,8 +194,8 @@ class Assembler():
 
         return tokens
 
-    def __parseBranchLabel(self, line_nr, tokens, branch, registers):
-        address = self.__validateLabel(tokens[-1])
+    def __parse_branch_label(self, line_nr, tokens, branch, registers):
+        address = self.__validate_label(tokens[-1])
         for cmd in branch:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -192,3 +214,12 @@ class Assembler():
         tokens[-1] = Bits(int=offset, length=16).bin
 
         return tokens
+
+    def __generate_start(self, start_address, zeros_constants, commands, registers):
+        branch = self.__parse_branch_immediate(
+            ['BEQ', 'R1', 'R2', "{ADDRESS}".format(ADDRESS=start_address)],
+            commands['branch'],
+            registers
+        )
+        zeros_constants[0] = ''.join(branch)
+        return zeros_constants

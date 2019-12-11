@@ -10,17 +10,10 @@
       "request": "launch",
       "program": "${workspaceFolder}/app/main.py",
       "console": "internalConsole",
-      "cwd": "${fileDirname}",
-      "args": ["input.txt"]
-    },
-    {
-      "name": "Python: Run super32emu",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/app/super32emu/main.py",
-      "console": "internalConsole",
-      "cwd": "${fileDirname}",
-      "args": []
+      "cwd": "${workspaceFolder}/app",
+      "args": [
+        "input.txt"
+      ]
     }
   ]
 }

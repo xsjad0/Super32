@@ -3,8 +3,6 @@
 import logging
 import sys
 
-LOGGER = logging.getLogger("[assembler]")
-
 
 class ResourceManager(object):
     """Context manager class to handle system ressources"""
@@ -18,7 +16,7 @@ class ResourceManager(object):
         try:
             self.open_file = open(self.filename, self.mode)
         except FileNotFoundError as e:
-            LOGGER.error("{strerror}{filename}".format(
+            logging.error("{strerror}: {filename}".format(
                 strerror=e.strerror, filename=e.filename))
             sys.exit(-1)
         else:

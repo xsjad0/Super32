@@ -1,5 +1,16 @@
-start:  ADD R1,R20,R12
+        ORG 12
+        DEFINE 10
+        DEFINE 11
+
+        ORG 20
+        START
+        ADD R1,R20,R12
         SUB R2,R1,R4
 loop:   LW R1,0(R2)
         SW R1,0(R2)
         BEQ R1,R2,loop
+        END
+
+        ORG 40
+        DEFINE 1
+        DEFINE 2

@@ -5,6 +5,7 @@ from pyassembler.inout.fileio import FileIO
 from pyassembler.assembler.assembler import Assembler
 from pyassembler.settings.settings import Settings
 from pyassembler.generator.generator import Generator
+from pyassembler.preprocessor.preprocessor import Preprocessor
 
 
 def main(args):
@@ -12,13 +13,22 @@ def main(args):
 
     Settings.load()
     cfg = FileIO.read_json('instructionset.json')
-    code = FileIO.read_code(args.input)
+    input_file = FileIO.read_code(args.input)
 
+    preprocessor = Preprocessor()
     assembler = Assembler()
     generator = Generator(args.generator)
 
+    code_address, code, zeros_constants = preprocessor.parse(
+        input_file=input_file
+    )
     machine_code = assembler.parse(
-        code, commands=cfg['commands'], registers=cfg['registers'])
+        code_address=code_address,
+        code=code,
+        zeros_constants=zeros_constants,
+        commands=cfg['commands'],
+        registers=cfg['registers']
+    )
 
     generator.write(args.output, machine_code)
 
