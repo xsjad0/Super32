@@ -1,16 +1,36 @@
+from PySide2.QtWidgets import QGridLayout, QGroupBox, QHBoxLayout, QLineEdit, QPushButton, QWidget
+from PySide2.QtCore import Qt
 
-from PySide2.QtWidgets import QPushButton, QDialog
 
+class Emulator(QWidget):
+    def __init__(self):
+        QWidget.__init__(self)
 
-class Emulator(QDialog):
-    def __init__(self, parent=None):
-        super(Emulator, self).__init__(parent)
+        self.registerGroup = QGroupBox("Register")
+        self.storageGroup = QGroupBox("Storage")
+        self.symbolGroup = QGroupBox("Symbol table")
 
-        self.setWindowTitle("Emulator")
+        layout = QGridLayout()
+        layout.addWidget(self.registerGroup, 0, 0, 1, 2)
+        layout.addWidget(self.storageGroup, 1, 0, 1, 1)
+        layout.addWidget(self.symbolGroup, 1, 1, 1, 1)
 
-        self.button = QPushButton("Test")
+        self.setLayout(layout)
 
-    @staticmethod
-    def run():
-        emulator = Emulator()
-        emulator.exec_()
+        self.createRegister()
+
+    def createRegister(self):
+        layout = QHBoxLayout()
+
+        r1 = QLineEdit()
+        r2 = QLineEdit()
+        r3 = QLineEdit()
+        r4 = QLineEdit()
+
+        layout.addWidget(r1)
+        layout.addWidget(r2)
+        layout.addWidget(r3)
+        layout.addWidget(r4)
+        layout.setAlignment(Qt.AlignTop)
+
+        self.registerGroup.setLayout(layout)
