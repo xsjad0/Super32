@@ -11,19 +11,14 @@ REG_SIZE = 4  # bytes
 class Assembler():
     """Assembler class"""
 
-    def __init__(self):
+    def __init__(self, architecture):
         self.__delimiters = ['(', ')', ',']
         self.__symboltable = {}
+        self.__architecture = architecture
 
     def parse(self, code_address, code, zeros_constants, commands, registers):
         bitcode = []
 
-        zeros_constants = self.__generate_start(
-            code_address,
-            zeros_constants,
-            commands,
-            registers
-        )
         code = self.__generate_symboltable(code)
 
         for line_nr, line in enumerate(code):
@@ -48,11 +43,21 @@ class Assembler():
                 raise Exception(
                     "Parsing error. Command not found: " + tokens[0])
 
-        machine_code = self.__generate_machinecode(
-            code_address,
-            bitcode,
-            zeros_constants
-        )
+        if not self.__architecture.value:  # single
+            zeros_constants = self.__generate_start(
+                code_address,
+                zeros_constants,
+                commands,
+                registers
+            )
+            machine_code = self.__generate_machinecode(
+                code_address,
+                bitcode,
+                zeros_constants
+            )
+        else:
+            machine_code = bitcode
+
         return machine_code
 
     def __generate_machinecode(self, code_address, bitcode, zeros_constants):
@@ -216,8 +221,9 @@ class Assembler():
         return tokens
 
     def __generate_start(self, start_address, zeros_constants, commands, registers):
+        branch_address = int(start_address / REG_SIZE)
         branch = self.__parse_branch_immediate(
-            ['BEQ', 'R1', 'R2', "{ADDRESS}".format(ADDRESS=start_address)],
+            ['BEQ', 'R1', 'R2', "{ADDRESS}".format(ADDRESS=branch_address)],
             commands['branch'],
             registers
         )

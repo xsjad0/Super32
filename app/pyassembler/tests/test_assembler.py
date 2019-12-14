@@ -3,6 +3,7 @@ import json
 import pytest
 
 from pyassembler.assembler.assembler import Assembler
+from pyassembler.assembler.architecture import Architectures
 from pyassembler.preprocessor.preprocessor import Preprocessor
 
 
@@ -19,7 +20,7 @@ JSON_STRING = (
     '"R29": "11101", "R30": "11110", "R31": "11111"}}'
 )
 CFG = json.loads(JSON_STRING)
-ASSEMBLER = Assembler()
+ASSEMBLER = Assembler(Architectures.SINGLE)
 PREPROCESSOR = Preprocessor()
 
 
@@ -35,7 +36,7 @@ def test_parse_add():
     )
 
     assert result == [
-        '00010000001000100000000000000100',
+        '00010000001000100000000000000001',
         '00000010100011000000100000000000'
     ]
 
@@ -52,7 +53,7 @@ def test_parse_sub():
     )
 
     assert result == [
-        '00010000001000100000000000000100',
+        '00010000001000100000000000000001',
         '00000000001001000001000000000010'
     ]
 
@@ -69,7 +70,7 @@ def test_parse_lw():
     )
 
     assert result == [
-        '00010000001000100000000000000100',
+        '00010000001000100000000000000001',
         '10001100010000010000000000000000'
     ]
 
@@ -86,7 +87,7 @@ def test_parse_sw():
     )
 
     assert result == [
-        '00010000001000100000000000000100',
+        '00010000001000100000000000000001',
         '10101100010000010000000000000000'
     ]
 
@@ -103,7 +104,7 @@ def test_parse_beq_imm():
     )
 
     assert result == [
-        '00010000001000100000000000000100',
+        '00010000001000100000000000000001',
         '00010000010000010000000000000000'
     ]
 

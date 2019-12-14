@@ -10,7 +10,7 @@ These instructions will help you to get your environment ready to build, develop
 
 ### Prerequisites
 
-You'll need the following tools for py-assembler:
+You'll need the following tools for pyassembler:
 
 - [Python 3](https://www.python.org/)
 - Python modules defined in requirements.txt
@@ -19,9 +19,14 @@ For the Super32 project you need:
 
 - [LLVM](https://llvm.org/)
 
-### Run py-assembler
+### Write assembler code
 
-To use the python assembler you must change directory to py-assembler and run main.py with python. To actually assemble code you have to provide an input file via argument.
+Take a look at the [instructionset](https://github.com/xsjad0/Super32/blob/master/app/instructionset.json) of the Super32 processor.
+Also, feel free to include [these fancy assembler directives](https://github.com/xsjad0/Super32/blob/master/app/pyassembler/preprocessor/asmdirectives.py) to improve your code.
+
+### Run pyassembler
+
+To use the python assembler you must change directory to pyassembler and run main.py with python. To actually assemble code you have to provide an input file via argument.
 
 ```Bash
 cd app
@@ -29,6 +34,14 @@ python main.py input.txt
 ```
 
 If you want to define a custom output name / path, use the '-o' argument flag.
+All available options are listed in the table below.
+
+Option | Default | Description
+-|-|-
+-h / --help | - | Display help information
+-o / --output | output.txt | Custom output name / path
+-g / --generator | lines | Specify output format. use ```lines``` to generate 32bit machine-code each line. Use ```stream``` to generate one single line machine-code.
+-a / --architecture | single | Specify processor architecture. use ```single``` to select single-memory architecture. Use ```multi``` to select dual-memory architecture.
 
 ## Running the tests
 
@@ -37,3 +50,17 @@ We use [pytest](https://docs.pytest.org/en/latest/) for testing. To run these te
 ```Bash
 pytest test_{test_name}.py
 ```
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [releases on this repository](https://github.com/xsjad0/Super32/releases).
+
+## Authors
+
+- *Marcel Freiberg* - [freib98](https://github.com/freib98)
+- *Marius Schenzle* - [xsjad0](https://github.com/xsjad0)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/xsjad0/Super32/blob/master/LICENSE) file for details
+

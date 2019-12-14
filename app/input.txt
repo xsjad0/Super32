@@ -1,16 +1,12 @@
         ORG 12
-        DEFINE 10
-        DEFINE 11
+        DEFINE 1
+        DEFINE 2
+        DEFINE 0
 
         ORG 20
         START
-        ADD R1,R20,R12
-        SUB R2,R1,R4
-loop:   LW R1,0(R2)
-        SW R1,0(R2)
-        BEQ R1,R2,loop
+        LW R0,12(R5)
+        LW R1,16(R5)
+        ADD R2,R0,R1
+        SW R2,20(R5)
         END
-
-        ORG 40
-        DEFINE 1
-        DEFINE 2
