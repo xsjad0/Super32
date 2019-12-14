@@ -141,10 +141,10 @@ class Assembler():
                 if token == reg:
                     tokens[i] = registers[reg]
 
-        self.__validate_bits(''.join(tokens))
-
         offset = int(tokens[2])
         tokens[2] = Bits(int=offset, length=16).bin
+
+        self.__validate_bits(''.join(tokens))
 
         # rearrenge bit-order
         order = [0, 3, 1, 2]
