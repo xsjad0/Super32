@@ -1,13 +1,14 @@
+"""python emulator"""
 import sys
-from mainWindow import MainWindow
 from PySide2.QtWidgets import QApplication
+from main_window import MainWindow
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    APP = QApplication(sys.argv)
 
-    widget = MainWindow()
-    widget.resize(1280, 720)
-    widget.show()
+    WIDGET = MainWindow()
+    WIDGET.resize(1280, 720)
+    WIDGET.show()
 
-    sys.exit(app.exec_())
+    sys.exit(APP.exec_())

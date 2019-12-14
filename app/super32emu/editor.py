@@ -1,8 +1,11 @@
+"""python emulator"""
 from PySide2.QtWidgets import QFrame, QPlainTextEdit, QTabWidget, QVBoxLayout, QWidget
 from PySide2.QtGui import QFont
 
 
 class Editor(QWidget):
+    """Editor widget"""
+
     def __init__(self):
         QWidget.__init__(self)
 
@@ -13,7 +16,7 @@ class Editor(QWidget):
         tab = QTabWidget()
         tab.addTab(textarea, "New File")
 
-        editorLayout = QVBoxLayout()
-        editorLayout.addWidget(tab)
+        editor_layout = QVBoxLayout()
+        editor_layout.addWidget(tab)
 
-        self.setLayout(editorLayout)
+        self.setLayout(editor_layout)
