@@ -9,18 +9,18 @@ from pyassembler.preprocessor.preprocessor import Preprocessor
 from pyassembler.assembler.architecture import Architectures
 
 
-def single(args):
+def single(ARGS):
     """ main entry point for python Super32 assembler 
     (with single storage)
     """
 
     Settings.load()
     cfg = FileIO.read_json('instructionset.json')
-    input_file = FileIO.read_code(args.input)
+    input_file = FileIO.read_code(ARGS.input)
 
     preprocessor = Preprocessor()
     assembler = Assembler(Architectures.SINGLE)
-    generator = Generator(args.generator)
+    generator = Generator(ARGS.generator)
 
     code_address, code, zeros_constants, symboltable = preprocessor.parse(
         input_file=input_file
@@ -34,21 +34,21 @@ def single(args):
         symboltable=symboltable
     )
 
-    generator.write(args.output, machine_code)
+    generator.write(ARGS.output, machine_code)
 
 
-def multi(args):
+def multi(ARGS):
     """ main entry point for python Super32 assembler 
     (with separate storages for instructions and data)
     """
 
     Settings.load()
     cfg = FileIO.read_json('instructionset.json')
-    input_file = FileIO.read_code(args.input)
+    input_file = FileIO.read_code(ARGS.input)
 
     preprocessor = Preprocessor()
     assembler = Assembler(Architectures.MULTI)
-    generator = Generator(args.generator)
+    generator = Generator(ARGS.generator)
 
     code_address, code, zeros_constants = preprocessor.parse(
         input_file=input_file
@@ -62,8 +62,8 @@ def multi(args):
         registers=cfg['registers']
     )
 
-    generator.write(args.output[0], machine_code_instructions)
-    generator.write(args.output[1], zeros_constants)
+    generator.write(ARGS.output[0], machine_code_instructions)
+    generator.write(ARGS.output[1], zeros_constants)
 
 
 if __name__ == "__main__":
@@ -88,19 +88,31 @@ if __name__ == "__main__":
     )
     ARGPARSER.add_argument(
         '-o', '--output',
-        default='output',
         metavar='output',
         help='path to generated machinecode file'
     )
     ARGS = ARGPARSER.parse_args()
 
+    if ARGS.output is None:
+        ARGS.output = ARGS.input.rsplit('.', 1)[0] + '.o'
+
     # choose super32 architecture
     if ARGS.architecture == 'multi':
+        OUTPUT = ARGS.output.rsplit('.')
+        NAME = OUTPUT[0]
+        ENDING = OUTPUT[-1]
         ARGS.output = [
-            ARGS.output + '_instructions.txt',
-            ARGS.output + '_constants.txt'
+            "{filename}_{extension}.{fileending}".format(
+                filename=NAME,
+                extension='instructions',
+                fileending=ENDING
+            ),
+            "{filename}_{extension}.{fileending}".format(
+                filename=NAME,
+                extension='memory',
+                fileending=ENDING
+            )
         ]
         multi(ARGS)
     else:
-        ARGS.output = ARGS.output + '.txt'
         single(ARGS)
