@@ -16,10 +16,11 @@ class Assembler():
         self.__symboltable = {}
         self.__architecture = architecture
 
-    def parse(self, code_address, code, zeros_constants, commands, registers):
-        bitcode = []
+    def parse(self, code_address, code, zeros_constants, commands, registers, symboltable):
+        """method to parse assembler code"""
 
-        code = self.__generate_symboltable(code)
+        bitcode = []
+        self.__symboltable = symboltable
 
         for line_nr, line in enumerate(code):
             logging.debug(str(line))
@@ -27,18 +28,29 @@ class Assembler():
                 line = line.replace(delimiter, ' ')
             line = line.strip()
             tokens = line.split(' ')
+            current_address = code_address + line_nr * REG_SIZE
             if len(tokens[0]) == 0:
                 continue
             if tokens[0] in commands['arithmetic']:
                 bitcode = bitcode + self.__parse_arithmetic(
-                    tokens, commands['arithmetic'], registers)
+                    tokens,
+                    commands['arithmetic'],
+                    registers
+                )
             elif tokens[0] in commands['storage']:
                 bitcode = bitcode + self.__parse_storage(
-                    tokens, commands['storage'], registers)
+                    current_address,
+                    tokens,
+                    commands['storage'],
+                    registers
+                )
             elif tokens[0] in commands['branch']:
-                bitcode = bitcode + \
-                    self.__parse_branch(
-                        line_nr, tokens, commands['branch'], registers)
+                bitcode = bitcode + self.__parse_branch(
+                    current_address,
+                    tokens,
+                    commands['branch'],
+                    registers
+                )
             else:
                 raise Exception(
                     "Parsing error. Command not found: " + tokens[0])
@@ -67,30 +79,11 @@ class Assembler():
             machine_code[i] = bitcode_line
         return machine_code
 
-    def __generate_symboltable(self, code):
-        """ builds a dictionary within keys are the lables
-        and values are the labels address.
-        returns code without labels."""
-
-        code_without_lables = []
-        for i, line in enumerate(code):
-            label_code = line.split(':')
-            label = label_code[0]
-            if len(label) != len(line):
-                self.__symboltable[label] = i
-                instruction = label_code.pop().strip()
-                code_without_lables = code_without_lables + [instruction]
-            else:
-                instruction = label_code.pop().strip()
-                code_without_lables = code_without_lables + [instruction]
-
-        return code_without_lables
-
     def __validate_label(self, label):
         if label not in self.__symboltable.keys():
             raise Exception("Label not found: " + label)
-        else:
-            return self.__symboltable.get(label)
+
+        return self.__symboltable.get(label)
 
     def __validate_code_length(self, machine_code):
         if len(machine_code) != 32:
@@ -107,6 +100,7 @@ class Assembler():
 
     def __parse_arithmetic(self, tokens, arithmetic, registers):
         self.__validate_token_length(tokens)
+
         for cmd in arithmetic:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -133,8 +127,9 @@ class Assembler():
         logging.debug(machine_code)
         return [machine_code]
 
-    def __parse_storage(self, tokens, storage, registers):
+    def __parse_storage(self, current_address, tokens, storage, registers):
         self.__validate_token_length(tokens)
+
         for cmd in storage:
             for i, token in enumerate(tokens):
                 if token == cmd:
@@ -146,8 +141,18 @@ class Assembler():
                 if token == reg:
                     tokens[i] = registers[reg]
 
-        offset = int(tokens[2])
-        tokens[2] = Bits(int=offset, length=16).bin
+        label_or_number = tokens[2]
+        if label_or_number.isdecimal():  # offset
+            offset = int(label_or_number)
+            tokens[2] = Bits(int=offset, length=16).bin
+        else:  # label
+            address = self.__validate_label(label_or_number)
+            offset = address - current_address
+            if offset < 0:
+                offset -= REG_SIZE  # adjustment due to pc + 4
+                # adjustment due to offset << 2
+                offset = int(offset / REG_SIZE)
+            tokens[2] = Bits(int=offset, length=16).bin
 
         self.__validate_bits(''.join(tokens))
 
@@ -161,14 +166,32 @@ class Assembler():
         logging.debug(machine_code)
         return [machine_code]
 
-    def __parse_branch(self, line_nr, tokens, branch, registers):
+    def __parse_branch(self, current_address, tokens, branch, registers):
         self.__validate_token_length(tokens)
 
-        if tokens[-1].isdecimal():
-            tokens = self.__parse_branch_immediate(tokens, branch, registers)
-        else:
-            tokens = self.__parse_branch_label(
-                line_nr, tokens, branch, registers)
+        for cmd in branch:
+            for i, token in enumerate(tokens):
+                if token == cmd:
+                    tokens[i] = branch[cmd]
+                    break
+
+        for reg in registers:
+            for i, token in enumerate(tokens):
+                if token == reg:
+                    tokens[i] = registers[reg]
+
+        label_or_number = tokens[-1]
+        if label_or_number.isdecimal():  # absolut address
+            address = int(label_or_number)
+            tokens[-1] = Bits(int=address, length=16).bin
+        else:  # label
+            address = self.__validate_label(label_or_number)
+            offset = address - current_address
+            if offset < 0:
+                offset -= REG_SIZE  # adjustment due to pc + 4
+                # adjustment due to offset << 2
+                offset = int(offset / REG_SIZE)
+            tokens[-1] = Bits(int=offset, length=16).bin
 
         self.__validate_bits(''.join(tokens))
 
@@ -182,47 +205,10 @@ class Assembler():
         logging.debug(machine_code)
         return [machine_code]
 
-    def __parse_branch_immediate(self, tokens, branch, registers):
-        for cmd in branch:
-            for i, token in enumerate(tokens):
-                if token == cmd:
-                    tokens[i] = branch[cmd]
-                    break
-
-        for reg in registers:
-            for i, token in enumerate(tokens):
-                if token == reg:
-                    tokens[i] = registers[reg]
-
-        offset = int(tokens[-1])
-        tokens[-1] = Bits(int=offset, length=16).bin
-
-        return tokens
-
-    def __parse_branch_label(self, line_nr, tokens, branch, registers):
-        address = self.__validate_label(tokens[-1])
-        for cmd in branch:
-            for i, token in enumerate(tokens):
-                if token == cmd:
-                    tokens[i] = branch[cmd]
-                    break
-
-        for reg in registers:
-            for i, token in enumerate(tokens):
-                if token == reg:
-                    tokens[i] = registers[reg]
-
-        # negativ offset indicates to jump backwards
-        offset = address - line_nr
-        if offset < 0:
-            offset -= 1
-        tokens[-1] = Bits(int=offset, length=16).bin
-
-        return tokens
-
     def __generate_start(self, start_address, zeros_constants, commands, registers):
-        branch_address = int(start_address / REG_SIZE)
-        branch = self.__parse_branch_immediate(
+        branch_address = int(start_address / REG_SIZE - 1)
+        branch = self.__parse_branch(
+            0,
             ['BEQ', 'R1', 'R2', "{ADDRESS}".format(ADDRESS=branch_address)],
             commands['branch'],
             registers

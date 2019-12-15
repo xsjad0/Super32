@@ -22,7 +22,7 @@ def single(args):
     assembler = Assembler(Architectures.SINGLE)
     generator = Generator(args.generator)
 
-    code_address, code, zeros_constants = preprocessor.parse(
+    code_address, code, zeros_constants, symboltable = preprocessor.parse(
         input_file=input_file
     )
     machine_code = assembler.parse(
@@ -30,7 +30,8 @@ def single(args):
         code=code,
         zeros_constants=zeros_constants,
         commands=cfg['commands'],
-        registers=cfg['registers']
+        registers=cfg['registers'],
+        symboltable=symboltable
     )
 
     generator.write(args.output, machine_code)

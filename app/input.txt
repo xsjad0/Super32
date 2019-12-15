@@ -1,12 +1,16 @@
         ORG 12
-        DEFINE 1
-        DEFINE 2
-        DEFINE 0
+const1: DEFINE 1
+const2: DEFINE 2
+result: DEFINE 0
 
-        ORG 20
+' start of code
+
+        ORG 24
         START
-        LW R0,12(R5)
-        LW R1,16(R5)
+        LW R0,const1(R5)
+test:   LW R1,const2(R5)
         ADD R2,R0,R1
-        SW R2,20(R5)
+        SW R2,result(R5)
         END
+
+' end of code
