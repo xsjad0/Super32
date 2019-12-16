@@ -1,9 +1,9 @@
 """ python assembler """
 
 import argparse
-from pyassembler.inout.fileio import FileIO
+from super32utils.inout.fileio import FileIO
+from super32utils.settings.settings import Settings
 from pyassembler.assembler.assembler import Assembler
-from pyassembler.settings.settings import Settings
 from pyassembler.generator.generator import Generator
 from pyassembler.preprocessor.preprocessor import Preprocessor
 from pyassembler.assembler.architecture import Architectures

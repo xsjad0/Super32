@@ -1,6 +1,6 @@
 """ File format generator module """
 
-from pyassembler.inout.fileio import FileIO
+from super32utils.inout.fileio import FileIO
 
 
 class Generator:

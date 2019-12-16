@@ -10,6 +10,9 @@
       "request": "launch",
       "program": "${workspaceFolder}/app/main.py",
       "console": "internalConsole",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/app"
+      },
       "cwd": "${workspaceFolder}/app",
       "args": [
         "input.txt"

@@ -5,7 +5,7 @@ from PySide2.QtCore import Slot
 from editor import Editor
 from emulator import Emulator
 from footer import Footer
-from resource_manager import ResourceManager
+from super32utils.manager.resource_manager import ResourceManager
 
 
 class MainWindow(QMainWindow):
@@ -88,6 +88,7 @@ class MainWindow(QMainWindow):
 
 class MainWidget(QWidget):
     """This main widget contains all the sub-widgets"""
+
     def __init__(self):
         QWidget.__init__(self)
 

@@ -2,7 +2,7 @@
 
 import logging
 import json
-from pyassembler.manager.resource_manager import ResourceManager
+from super32utils.manager.resource_manager import ResourceManager
 
 
 class FileIO:
