@@ -19,14 +19,14 @@ class Preprocessor:
     def parse(self, input_file):
         """method to parse assembler directives inside assembler code"""
 
-        # remove als comments (line starting with ')
-        input_file_without_comments = self.__remove_comments(
-            input_file
-        )
-
         # trim and filter empty lines
         input_file_trimmed = [str.strip(line)
-                              for line in input_file_without_comments if line]
+                              for line in input_file if line]
+
+        # remove als comments (line starting with ')
+        input_file_without_comments = self.__remove_comments(
+            input_file_trimmed
+        )
 
         # store labels + address in symboltable-dictionary
         input_file_without_labels = self.__generate_symboltable(

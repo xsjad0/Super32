@@ -3,7 +3,7 @@ const1: DEFINE 1
 const2: DEFINE 2
 result: DEFINE 0
 
-' start of code
+        ' start of code
 
         ORG 24
         START
@@ -13,4 +13,4 @@ test:   LW R1,const2(R5)
         SW R2,result(R5)
         END
 
-' end of code
+        ' end of code

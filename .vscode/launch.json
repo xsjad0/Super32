@@ -15,7 +15,7 @@
         "PYTHONPATH": "${workspaceFolder}/app"
       },
       "args": [
-        "input.txt"
+        "example_code.s32"
       ]
     },
     {
