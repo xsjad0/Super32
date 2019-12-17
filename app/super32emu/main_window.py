@@ -1,11 +1,11 @@
 """python emulator"""
 from PySide2.QtWidgets import QAction, QFileDialog, QGridLayout, QMainWindow, QWidget
-from PySide2.QtGui import QIcon
+from PySide2.QtGui import QIcon, Qt
 from PySide2.QtCore import Slot
-from editor import Editor
-from emulator import Emulator
-from footer import Footer
 from super32utils.manager.resource_manager import ResourceManager
+from editor import Editor
+from emulator import DockEmulator
+from footer import DockFooter
 
 
 class MainWindow(QMainWindow):
@@ -19,8 +19,13 @@ class MainWindow(QMainWindow):
         self.__create_menu()
         self.__create_toolbar()
 
-        self.main_widget = MainWidget()
-        self.setCentralWidget(self.main_widget)
+        editor = Editor()
+        emulator = DockEmulator()
+        footer = DockFooter()
+
+        self.setCentralWidget(editor)
+        self.addDockWidget(Qt.RightDockWidgetArea, emulator)
+        self.addDockWidget(Qt.BottomDockWidgetArea, footer)
 
     def __create_menu(self):
         menu_bar = self.menuBar()
@@ -45,7 +50,7 @@ class MainWindow(QMainWindow):
         help_menu.addAction("Info")
 
     def __create_toolbar(self):
-        tb_open = QAction(QIcon("resources/open.png"), "run", self)
+        tb_open = QAction(QIcon("resources/open.png"), "open", self)
         tb_save = QAction(QIcon("resources/save.png"), "save", self)
         tb_run = QAction(QIcon("resources/run.png"), "run", self)
 
@@ -84,22 +89,3 @@ class MainWindow(QMainWindow):
     @Slot()
     def __run(self):
         """Run the emulator with the written assembler"""
-
-
-class MainWidget(QWidget):
-    """This main widget contains all the sub-widgets"""
-
-    def __init__(self):
-        QWidget.__init__(self)
-
-        editor = Editor()
-        emulator = Emulator()
-        footer = Footer()
-
-        layout = QGridLayout()
-        layout.addWidget(editor, 0, 0, 1, 1)
-        layout.addWidget(emulator, 0, 1, 1, 1)
-        layout.addWidget(footer, 1, 0, 1, 2)
-
-        self.setLayout(layout)
-        layout.setContentsMargins(0, 0, 0, 0)
