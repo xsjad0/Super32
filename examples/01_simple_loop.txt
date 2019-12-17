@@ -1,0 +1,23 @@
+' calculate const1 + result,
+' until result reaches goal,
+' then quit.
+
+        ORG 12
+const1: DEFINE 1
+result: DEFINE 0
+goal:   DEFINE 10
+
+        ' start of code
+
+        ORG 24
+        START
+        LW R3,const1(R5)
+loop:   LW R0,result(R5)
+        ADD R2,R0,R1
+        SW R2,result(R5)
+        BEQ R2,R3,stop
+        BEQ R5,R5,loop
+stop:   SW R2,result(R5)
+        END
+
+        ' end of code

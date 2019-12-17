@@ -24,12 +24,34 @@ For the Super32 project you need:
 Take a look at the [instructionset](https://github.com/xsjad0/Super32/blob/master/app/instructionset.json) of the Super32 processor.
 Also, feel free to include [these fancy assembler directives](https://github.com/xsjad0/Super32/blob/master/app/pyassembler/preprocessor/asmdirectives.py) to improve your code.
 
-### Run pyassembler
+Here are some rules you always have to keep in mind when you write some assembler code:
+
+Your code always has to start with
+```Assembler
+ORG address
+START
+```
+and end with an
+```Assembler
+END
+```
+assembler directives, where address MUST be greater than and be able to devide by 4.
+Define constants in your memory like this
+```Assembler
+DEFINE 0
+```
+For easier referencing the constants in your code, put a lable in front of your constant
+```Assembler
+const: DEFINE 0
+```
+
+
+### Run super32assembler
 
 To use the python assembler you must change directory to pyassembler and run main.py with python. To actually assemble code you have to provide an input file via argument.
 
 ```Bash
-cd app
+cd app/super32assembler
 python main.py input.txt
 ```
 
