@@ -3,14 +3,14 @@
 import argparse
 from super32utils.inout.fileio import FileIO
 from super32utils.settings.settings import Settings
-from pyassembler.assembler.assembler import Assembler
-from pyassembler.generator.generator import Generator
-from pyassembler.preprocessor.preprocessor import Preprocessor
-from pyassembler.assembler.architecture import Architectures
+from assembler.assembler import Assembler
+from assembler.architecture import Architectures
+from generator.generator import Generator
+from preprocessor.preprocessor import Preprocessor
 
 
 def single(ARGS):
-    """ main entry point for python Super32 assembler 
+    """ main entry point for python Super32 assembler
     (with single storage)
     """
 
@@ -38,7 +38,7 @@ def single(ARGS):
 
 
 def multi(ARGS):
-    """ main entry point for python Super32 assembler 
+    """ main entry point for python Super32 assembler
     (with separate storages for instructions and data)
     """
 
@@ -50,7 +50,7 @@ def multi(ARGS):
     assembler = Assembler(Architectures.MULTI)
     generator = Generator(ARGS.generator)
 
-    code_address, code, zeros_constants = preprocessor.parse(
+    code_address, code, zeros_constants, symboltable = preprocessor.parse(
         input_file=input_file
     )
 
@@ -59,7 +59,8 @@ def multi(ARGS):
         code=code,
         zeros_constants=zeros_constants,
         commands=cfg['commands'],
-        registers=cfg['registers']
+        registers=cfg['registers'],
+        symboltable=symboltable
     )
 
     generator.write(ARGS.output[0], machine_code_instructions)

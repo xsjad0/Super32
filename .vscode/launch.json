@@ -5,18 +5,29 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Run pyassembler",
+      "name": "Python: Run super32assembler",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/app/main.py",
+      "program": "${workspaceFolder}/app/super32assembler/main.py",
       "console": "internalConsole",
+      "cwd": "${workspaceFolder}/app/super32assembler",
       "env": {
         "PYTHONPATH": "${workspaceFolder}/app"
       },
-      "cwd": "${workspaceFolder}/app",
       "args": [
         "input.txt"
       ]
+    },
+    {
+      "name": "Python: Run super32emu",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/app/super32emu/main.py",
+      "console": "internalConsole",
+      "cwd": "${workspaceFolder}/app/super32emu",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/app"
+      },
     }
   ]
 }
