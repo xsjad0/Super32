@@ -21,7 +21,7 @@ class Preprocessor:
 
         # trim and filter empty lines
         input_file_trimmed = [str.strip(line)
-                              for line in input_file if line]
+                              for line in input_file if str.strip(line)]
 
         # remove als comments (line starting with ')
         input_file_without_comments = self.__remove_comments(
