@@ -8,14 +8,18 @@
       "name": "Python: Run super32assembler",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/app/super32assembler/main.py",
+      "program": "${workspaceFolder}/app/super32assembler/super32assembler.py",
       "console": "internalConsole",
       "cwd": "${workspaceFolder}/app/super32assembler",
       "env": {
         "PYTHONPATH": "${workspaceFolder}/app"
       },
       "args": [
-        "example_code.s32"
+        "parse",
+        "example_code.s32",
+        "--output=example_code.o",
+        "--architecture=single",
+        "--generator=lines"
       ]
     },
     {

@@ -1,6 +1,19 @@
-""" python assembler """
+"""
+Usage:
+    super32assembler parse [--output=path]
+                           [--architecture=single | --architecture=multi]
+                           [--generator=lines | --generator=stream] <input-file>
+    super32assembler (-h | --help)
 
-import argparse
+
+Options:
+    -h --help               show this screen and exit
+    --output=<path>         specify the generated output file
+    --architecture=<type>   specify processor architecture [default: single]
+    --generator=<type>      specify output file format [default: lines]
+"""
+
+from docopt import docopt
 from super32utils.inout.fileio import FileIO
 from super32utils.settings.settings import Settings
 from assembler.assembler import Assembler
@@ -16,11 +29,11 @@ def single(ARGS):
 
     Settings.load()
     cfg = FileIO.read_json('instructionset.json')
-    input_file = FileIO.read_code(ARGS.input)
+    input_file = FileIO.read_code(ARGS['<input-file>'])
 
     preprocessor = Preprocessor()
     assembler = Assembler(Architectures.SINGLE)
-    generator = Generator(ARGS.generator)
+    generator = Generator(ARGS['--generator'])
 
     code_address, code, zeros_constants, symboltable = preprocessor.parse(
         input_file=input_file
@@ -34,7 +47,7 @@ def single(ARGS):
         symboltable=symboltable
     )
 
-    generator.write(ARGS.output, machine_code)
+    generator.write(ARGS['--output'], machine_code)
 
 
 def multi(ARGS):
@@ -44,11 +57,11 @@ def multi(ARGS):
 
     Settings.load()
     cfg = FileIO.read_json('instructionset.json')
-    input_file = FileIO.read_code(ARGS.input)
+    input_file = FileIO.read_code(ARGS['<input-file>'])
 
     preprocessor = Preprocessor()
     assembler = Assembler(Architectures.MULTI)
-    generator = Generator(ARGS.generator)
+    generator = Generator(ARGS['--generator'])
 
     code_address, code, zeros_constants, symboltable = preprocessor.parse(
         input_file=input_file
@@ -63,46 +76,22 @@ def multi(ARGS):
         symboltable=symboltable
     )
 
-    generator.write(ARGS.output[0], machine_code_instructions)
-    generator.write(ARGS.output[1], zeros_constants)
+    generator.write(ARGS['--output'][0], machine_code_instructions)
+    generator.write(ARGS['--output'][1], zeros_constants)
 
 
 if __name__ == "__main__":
-    ARGPARSER = argparse.ArgumentParser(description='Super32 assembly parser')
-    ARGPARSER.add_argument(
-        'input',
-        help='path to assembler file'
-    )
-    ARGPARSER.add_argument(
-        '-g', '--generator',
-        choices=['stream', 'lines'],
-        default='lines',
-        metavar='generator',
-        help='specify output format'
-    )
-    ARGPARSER.add_argument(
-        '-a', '--architecture',
-        choices=['single', 'multi'],
-        default='single',
-        metavar='architecture',
-        help='specify processor architecture'
-    )
-    ARGPARSER.add_argument(
-        '-o', '--output',
-        metavar='output',
-        help='path to generated machinecode file'
-    )
-    ARGS = ARGPARSER.parse_args()
+    ARGS = docopt(__doc__)
 
-    if ARGS.output is None:
-        ARGS.output = ARGS.input.rsplit('.', 1)[0] + '.o'
+    if ARGS['--output'] is None:
+        ARGS['--output'] = ARGS['<input-file>'].rsplit('.', 1)[0] + '.o'
 
     # choose super32 architecture
-    if ARGS.architecture == 'multi':
-        OUTPUT = ARGS.output.rsplit('.')
+    if ARGS['--architecture'] == 'multi':
+        OUTPUT = ARGS['--output'].rsplit('.')
         NAME = OUTPUT[0]
         ENDING = OUTPUT[-1]
-        ARGS.output = [
+        ARGS['--output'] = [
             "{filename}_{extension}.{fileending}".format(
                 filename=NAME,
                 extension='instructions',
