@@ -8,7 +8,7 @@
       "name": "Python: Run super32assembler",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/super32assembler/main.py",
+      "program": "${workspaceFolder}/super32assembler/super32assembler.py",
       "console": "internalConsole",
       "cwd": "${workspaceFolder}/super32assembler",
       "env": {
