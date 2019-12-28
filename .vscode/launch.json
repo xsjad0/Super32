@@ -8,11 +8,11 @@
       "name": "Python: Run super32assembler",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/app/super32assembler/super32assembler.py",
+      "program": "${workspaceFolder}/super32assembler/main.py",
       "console": "internalConsole",
-      "cwd": "${workspaceFolder}/app/super32assembler",
+      "cwd": "${workspaceFolder}/super32assembler",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}/app"
+        "PYTHONPATH": "${workspaceFolder}"
       },
       "args": [
         "parse",
@@ -26,11 +26,11 @@
       "name": "Python: Run super32emu",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/app/super32emu/main.py",
+      "program": "${workspaceFolder}/super32emu/main.py",
       "console": "internalConsole",
-      "cwd": "${workspaceFolder}/app/super32emu",
+      "cwd": "${workspaceFolder}/super32emu",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}/app"
+        "PYTHONPATH": "${workspaceFolder}"
       },
     }
   ]

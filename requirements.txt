@@ -1,6 +1,1 @@
-autopep8
-pylint
-pytest
-python-dotenv
-bitstring
-docopt==0.6.2
+-r requirements\production.txt

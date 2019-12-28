@@ -2,9 +2,9 @@
 import json
 import pytest
 
-from pyassembler.assembler.assembler import Assembler
-from pyassembler.assembler.architecture import Architectures
-from pyassembler.preprocessor.preprocessor import Preprocessor
+from super32assembler.assembler.assembler import Assembler
+from super32assembler.assembler.architecture import Architectures
+from super32assembler.preprocessor.preprocessor import Preprocessor
 
 
 JSON_STRING = (
