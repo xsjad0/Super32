@@ -53,6 +53,10 @@ class MainWindow(QMainWindow):
         tb_open = QAction(QIcon("resources/open.png"), "open", self)
         tb_save = QAction(QIcon("resources/save.png"), "save", self)
         tb_run = QAction(QIcon("resources/run.png"), "run", self)
+        tb_step = QAction(QIcon("resources/step.png"), "step", self)
+        tb_debug = QAction(QIcon("resources/debug.png"), "debug", self)
+        tb_separator = QAction("", self)
+        tb_separator.setSeparator(True)
 
         tb_open.triggered.connect(self.__open_file_dlg)
         tb_save.triggered.connect(self.__save_file_dlg)
@@ -61,7 +65,10 @@ class MainWindow(QMainWindow):
         tool_bar = self.addToolBar("$File")
         tool_bar.addAction(tb_open)
         tool_bar.addAction(tb_save)
+        tool_bar.addAction(tb_separator)
         tool_bar.addAction(tb_run)
+        tool_bar.addAction(tb_step)
+        tool_bar.addAction(tb_debug)
 
     @Slot()
     def __open_file_dlg(self):

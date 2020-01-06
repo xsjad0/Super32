@@ -1,5 +1,5 @@
 """python emulator"""
-from PySide2.QtWidgets import QHBoxLayout, QPushButton, QWidget, QDockWidget
+from PySide2.QtWidgets import QDockWidget, QHBoxLayout, QLabel, QWidget
 
 
 class DockFooter(QDockWidget):
@@ -44,12 +44,19 @@ class Footer(QWidget):
     def __init__(self):
         QWidget.__init__(self)
 
-        footer_button = QPushButton("footer")
+        self.status = QLabel(
+            '<img src="resources/check.png" width="22"></img>')
+
+        self.editor_position = QLabel('<h3>0,0</h3>')
 
         footer_layout = QHBoxLayout()
-        footer_layout.addWidget(footer_button)
-        # footerLayout.addStretch()
+        footer_layout.addWidget(self.status)
+        footer_layout.addStretch()
+        footer_layout.addWidget(self.editor_position)
 
         self.setLayout(footer_layout)
 
-        self.setStyleSheet("background-color: blue;")
+    def set_editor_position(self, pos_x, pos_y):
+        """Sets the text for the editor position label"""
+        self.editor_position.setText(
+            '<h3>' + str(pos_x) + ',' + str(pos_y) + '</h3>')
