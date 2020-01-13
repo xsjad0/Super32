@@ -2,7 +2,7 @@
 from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QWidget
 
 
-class Register(QWidget):
+class RegisterWidget(QWidget):
     """Register widget"""
 
     def __init__(self, text):
@@ -13,15 +13,20 @@ class Register(QWidget):
         if(text):
             self.label.setText(text)
 
-        text_input = QLineEdit()
-        text_input.setFixedWidth(80)
+        self.text_input = QLineEdit()
+        self.text_input.setFixedWidth(60)
 
         layout = QHBoxLayout()
         layout.addWidget(self.label)
-        layout.addWidget(text_input)
+        layout.addWidget(self.text_input)
+        layout.addStretch()
 
         self.setLayout(layout)
 
     def set_text(self, text):
         """Set the text of the label"""
         self.label.setText(text)
+
+    def set_value(self, value):
+        """Set the value of the register"""
+        self.text_input.setText(value)

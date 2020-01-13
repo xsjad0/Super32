@@ -2,14 +2,14 @@
 from PySide2.QtWidgets import QDockWidget, QHBoxLayout, QLabel, QWidget
 
 
-class DockFooter(QDockWidget):
+class FooterDockWidget(QDockWidget):
     """Dockable footer widget"""
 
     def __init__(self):
         QDockWidget.__init__(self)
 
-        footer = Footer()
-        self.setWidget(footer)
+        self.footer = FooterWidget()
+        self.setWidget(self.footer)
 
         self.setStyleSheet("""
         QDockWidget {
@@ -37,8 +37,11 @@ class DockFooter(QDockWidget):
         }
         """)
 
+    def get_widget(self):
+        return self.footer
 
-class Footer(QWidget):
+
+class FooterWidget(QWidget):
     """Footer widget"""
 
     def __init__(self):

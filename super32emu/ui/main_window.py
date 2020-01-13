@@ -3,9 +3,10 @@ from PySide2.QtWidgets import QAction, QFileDialog, QGridLayout, QMainWindow, QW
 from PySide2.QtGui import QIcon, Qt
 from PySide2.QtCore import Slot
 from super32utils.manager.resource_manager import ResourceManager
-from editor import Editor
-from emulator import DockEmulator
-from footer import DockFooter
+from .editor_widget import EditorWidget
+from .emulator_widget import EmulatorDockWidget
+from .footer_widget import FooterDockWidget
+from logic.emulator import Emulator
 
 
 class MainWindow(QMainWindow):
@@ -19,13 +20,16 @@ class MainWindow(QMainWindow):
         self.__create_menu()
         self.__create_toolbar()
 
-        editor = Editor()
-        emulator = DockEmulator()
-        footer = DockFooter()
+        editor_widget = EditorWidget()
+        emulator_dock_widget = EmulatorDockWidget()
+        footer_dock_widget = FooterDockWidget()
 
-        self.setCentralWidget(editor)
-        self.addDockWidget(Qt.RightDockWidgetArea, emulator)
-        self.addDockWidget(Qt.BottomDockWidgetArea, footer)
+        self.setCentralWidget(editor_widget)
+        self.addDockWidget(Qt.RightDockWidgetArea, emulator_dock_widget)
+        self.addDockWidget(Qt.BottomDockWidgetArea, footer_dock_widget)
+
+        self.emulator = Emulator(
+            editor_widget, emulator_dock_widget.get_widget(), footer_dock_widget.get_widget())
 
     def __create_menu(self):
         menu_bar = self.menuBar()
@@ -95,4 +99,5 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def __run(self):
-        """Run the emulator with the written assembler"""
+        """Runs the emulator"""
+        self.emulator.run()

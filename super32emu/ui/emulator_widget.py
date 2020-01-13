@@ -1,19 +1,18 @@
 """python emulator"""
-from PySide2.QtWidgets import QDockWidget, QGridLayout, QGroupBox, QHBoxLayout, QLineEdit, QPushButton, QVBoxLayout, QWidget
-from PySide2.QtCore import Qt
-from PySide2.QtCore import Slot
-from register import Register
-from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QDockWidget, QGridLayout, QGroupBox, QHBoxLayout, QLineEdit, QPushButton, QVBoxLayout, QWidget, QPlainTextEdit
+from PySide2.QtCore import Qt, Slot
+from PySide2.QtGui import QIcon, QFont
+from .register_widget import RegisterWidget
 
 
-class DockEmulator(QDockWidget):
+class EmulatorDockWidget(QDockWidget):
     """Dockable emulator widget"""
 
     def __init__(self):
         QDockWidget.__init__(self)
 
-        emulator = Emulator()
-        self.setWidget(emulator)
+        self.emulator = EmulatorWidget()
+        self.setWidget(self.emulator)
 
         self.setStyleSheet("""
             QDockWidget {
@@ -41,8 +40,11 @@ class DockEmulator(QDockWidget):
             }
         """)
 
+    def get_widget(self):
+        return self.emulator
 
-class Emulator(QWidget):
+
+class EmulatorWidget(QWidget):
     """Emulator widget"""
 
     def __init__(self):
@@ -60,13 +62,17 @@ class Emulator(QWidget):
         self.setLayout(layout)
 
         self.__create_register_group()
+        self.__create_storage_group()
+        self.__create_symbol_group()
 
     def __create_register_group(self):
         self.index = 0
         self.register = []
 
         for i in range(32):
-            self.register.append(Register('r' + str(i)))
+            r = RegisterWidget('r' + str(i))
+            r.set_value('00000000')
+            self.register.append(r)
 
         self.register_layout = QHBoxLayout()
         self.register_layout.addWidget(self.register[self.index])
@@ -92,13 +98,32 @@ class Emulator(QWidget):
         register_arrows_layout.addLayout(arrows_layout)
         register_arrows_layout.setAlignment(Qt.AlignTop)
 
-        program_counter = Register('Pc')
+        self.program_counter = RegisterWidget('Pc')
 
         register_group_layout = QVBoxLayout()
         register_group_layout.addLayout(register_arrows_layout)
-        register_group_layout.addWidget(program_counter)
+        register_group_layout.addWidget(self.program_counter)
 
         self.register_group.setLayout(register_group_layout)
+
+    def __create_storage_group(self):
+        self.storage = QPlainTextEdit()
+        self.storage.setFont(QFont('Sans serif', 8, QFont.Medium))
+        self.storage.setPlainText('0' * 10000)
+
+        storage_layout = QVBoxLayout()
+        storage_layout.addWidget(self.storage)
+
+        self.storage_group.setLayout(storage_layout)
+
+    def __create_symbol_group(self):
+        self.symbol = QPlainTextEdit()
+        self.symbol.setFont(QFont('Sans serif', 8, QFont.Medium))
+
+        symbol_layout = QVBoxLayout()
+        symbol_layout.addWidget(self.symbol)
+
+        self.symbol_group.setLayout(symbol_layout)
 
     @Slot()
     def __next_register(self):
@@ -126,3 +151,20 @@ class Emulator(QWidget):
         self.register_layout.addWidget(self.register[self.index + 1])
         self.register_layout.addWidget(self.register[self.index + 2])
         self.register_layout.addWidget(self.register[self.index + 3])
+
+    def set_register(self, index, value):
+        """Sets the value of a register chosen by its index"""
+        if index < 0 or index > 32:
+            raise Exception('Register out of index')
+
+        self.register[index].set_value(str(value))
+
+    def set_pc(self, value):
+        """Sets the value of the program counter"""
+
+        self.program_counter.set_value(str(value))
+
+    def set_storage(self, value):
+        """Sets the value of the storage"""
+
+        self.storage.setPlainText(str(value))
