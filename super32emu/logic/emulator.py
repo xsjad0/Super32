@@ -12,6 +12,12 @@ class Emulator():
         self.emulator_widget = emulator_widget
         self.footer_widget = footer_widget
 
+        for rindex in range(32):
+            self.emulator_widget.set_register(rindex, '00000000')
+
+        self.emulator_widget.set_pc(0)
+        self.emulator_widget.set_storage(''.ljust(2**10, '0'))
+
         self.cfg = FileIO.read_json('instructionset.json')
         self.commands = self.cfg['commands']
 
@@ -36,7 +42,9 @@ class Emulator():
         self.__emulate()
 
     def __emulate(self):
-        print(self.memory)
+        self.emulator_widget.set_storage(
+            ''.join(self.memory).ljust(2**10, '0'))
+
         self.program_counter = 0
 
         while self.program_counter < self.memory.__len__():
@@ -67,7 +75,10 @@ class Emulator():
                     instructionset[16:32])
 
             self.program_counter += 1
+
             self.emulator_widget.set_pc(self.program_counter)
+            self.emulator_widget.set_storage(
+                ''.join(self.memory).ljust(2**10, '0'))
 
     def __arithmetic_instruction(self, first_source, second_source, target, func):
         if func == self.commands['arithmetic']['SUB']:

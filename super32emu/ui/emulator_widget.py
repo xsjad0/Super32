@@ -71,7 +71,6 @@ class EmulatorWidget(QWidget):
 
         for i in range(32):
             r = RegisterWidget('r' + str(i))
-            r.set_value('00000000')
             self.register.append(r)
 
         self.register_layout = QHBoxLayout()
@@ -109,7 +108,6 @@ class EmulatorWidget(QWidget):
     def __create_storage_group(self):
         self.storage = QPlainTextEdit()
         self.storage.setFont(QFont('Sans serif', 8, QFont.Medium))
-        self.storage.setPlainText('0' * 10000)
 
         storage_layout = QVBoxLayout()
         storage_layout.addWidget(self.storage)
