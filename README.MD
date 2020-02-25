@@ -4,7 +4,7 @@ This repository contains the source code for a simple assembler / compiler for o
 
 At the moment this repository consists of two projects. py-assembler is an assembler, written in [Python](https://www.python.org/) and Super32 is an attempt to implement an actuall backend compiler with [LLVM](https://llvm.org/).
 
-Full documentation is found on [readthedocs](super32.readthedocs.io/en/mkdocs_documentation)
+Full documentation is found on [readthedocs](super32.readthedocs.io/en/latest).
 
 ## Getting Started
 
@@ -23,8 +23,8 @@ For the Super32 project you need:
 
 ### Write assembler code
 
-Take a look at the [instructionset](https://github.com/xsjad0/Super32/blob/master/app/instructionset.json) of the Super32 processor.
-Also, feel free to include [these fancy assembler directives](https://github.com/xsjad0/Super32/blob/master/app/pyassembler/preprocessor/asmdirectives.py) to improve your code.
+Take a look at the [instructionset](hhttps://github.com/xsjad0/Super32/blob/master/super32assembler/instructionset.json) of the Super32 processor.
+Also, feel free to include [these fancy assembler directives](https://github.com/xsjad0/Super32/blob/master/super32assembler/preprocessor/asmdirectives.py) to improve your code.
 
 Here are some rules you always have to keep in mind when you write some assembler code:
 
@@ -56,9 +56,10 @@ you first have to clone the git repository
 git clone https://github.com/xsjad0/Super32.git
 ```
 
-After you successfully cloned the repository, run the installation process via pip
+After you successfully cloned the repository, switch to the latest [release](https://github.com/xsjad0/Super32/releases) and run the installation process via pip
 
 ```Bash
+git checkout X.Y.Z
 pip install .
 ```
 
