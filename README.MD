@@ -23,7 +23,7 @@ For the Super32 project you need:
 
 ### Write assembler code
 
-Take a look at the [instructionset](hhttps://github.com/xsjad0/Super32/blob/master/super32assembler/instructionset.json) of the Super32 processor.
+Take a look at the [instructionset](https://github.com/xsjad0/Super32/blob/master/super32assembler/instructionset.json) of the Super32 processor.
 Also, feel free to include [these fancy assembler directives](https://github.com/xsjad0/Super32/blob/master/super32assembler/preprocessor/asmdirectives.py) to improve your code.
 
 Here are some rules you always have to keep in mind when you write some assembler code:
