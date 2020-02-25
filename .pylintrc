@@ -3,7 +3,7 @@
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
-extension-pkg-whitelist=
+extension-pkg-whitelist=PySide2
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
@@ -15,7 +15,7 @@ ignore-patterns=
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
-init-hook='import sys; sys.path.append('pyassembler'); sys.path.append('super32emu'); sys.path.append('super32utils')'
+init-hook='import sys; sys.path.append('super32assembler'); sys.path.append('super32emu'); sys.path.append('super32utils')'
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use.
