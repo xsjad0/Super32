@@ -4,6 +4,8 @@ This repository contains the source code for a simple assembler / compiler for o
 
 At the moment this repository consists of two projects. py-assembler is an assembler, written in [Python](https://www.python.org/) and Super32 is an attempt to implement an actuall backend compiler with [LLVM](https://llvm.org/).
 
+Full documentation is found on [readthedocs](super32.readthedocs.io/en/mkdocs_documentation)
+
 ## Getting Started
 
 These instructions will help you to get your environment ready to build, develop and run the project on your local machine.
