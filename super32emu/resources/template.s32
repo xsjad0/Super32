@@ -1,0 +1,17 @@
+' Author:       
+' Date:         
+' Description:  
+
+        ORG 4
+        ' Define constants here
+
+
+        ORG 20
+        START
+        ' insert code here
+        
+
+
+        ' end of file
+        END
+        

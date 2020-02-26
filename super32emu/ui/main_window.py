@@ -99,7 +99,10 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def __new(self):
-        self.editor_widget.new_tab()
+        template = ""
+        with ResourceManager("resources/template.s32", "r") as file:
+            template = file.read()
+        self.editor_widget.new_tab(content=template)
 
     @Slot()
     def __open(self):
