@@ -1,5 +1,6 @@
 """python emulator"""
 from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QWidget
+from PySide2.QtGui import QFont
 
 
 class RegisterWidget(QWidget):
@@ -10,11 +11,12 @@ class RegisterWidget(QWidget):
 
         self.label = QLabel()
 
-        if(text):
+        if text:
             self.label.setText(text)
 
         self.text_input = QLineEdit()
-        self.text_input.setFixedWidth(60)
+        self.text_input.setFixedWidth(35)
+        self.text_input.setFont(QFont('Fira Code', 8, QFont.Medium))
 
         layout = QHBoxLayout()
         layout.addWidget(self.label)

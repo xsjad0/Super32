@@ -1,6 +1,6 @@
 """python emulator"""
-from PySide2.QtWidgets import QDockWidget, QGridLayout, QGroupBox, QHBoxLayout, QLineEdit, QPushButton, QVBoxLayout, QWidget, QPlainTextEdit
-from PySide2.QtCore import Qt, Slot
+from PySide2.QtWidgets import QDockWidget, QGridLayout, QGroupBox, QHBoxLayout, QLineEdit, QPushButton, QVBoxLayout, QWidget, QPlainTextEdit, QFormLayout, QLabel, QSizePolicy
+from PySide2.QtCore import Qt, Slot, QMargins
 from PySide2.QtGui import QIcon, QFont
 from .register_widget import RegisterWidget
 
@@ -12,9 +12,10 @@ class EmulatorDockWidget(QDockWidget):
         QDockWidget.__init__(self)
 
         self.emulator = EmulatorWidget()
-        self.setWidget(self.emulator)
-
-        self.setStyleSheet("""
+        self.setWindowTitle(self.tr("Hardware-Monitor"))
+        self.setAllowedAreas(Qt.RightDockWidgetArea)
+        self.setStyleSheet(
+            """
             QDockWidget {
                 border: 1px solid lightgray;
                 titlebar-close-icon: url(close.png);
@@ -22,7 +23,7 @@ class EmulatorDockWidget(QDockWidget):
             }
 
             QDockWidget::title {
-                background: white;
+                background: lightgray;
             }
 
             QDockWidget::close-button, QDockWidget::float-button {
@@ -38,10 +39,10 @@ class EmulatorDockWidget(QDockWidget):
             QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
                 padding: 1px -1px -1px 1px;
             }
-        """)
+            """
+        )
 
-    def get_widget(self):
-        return self.emulator
+        self.setWidget(self.emulator)
 
 
 class EmulatorWidget(QWidget):
@@ -50,14 +51,15 @@ class EmulatorWidget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
 
-        self.register_group = QGroupBox("Register")
-        self.storage_group = QGroupBox("Storage")
-        self.symbol_group = QGroupBox("Symbol table")
+        self.register_group = QGroupBox(self.tr("Register"))
+        self.storage_group = QGroupBox(self.tr("Storage"))
+        self.symbol_group = QGroupBox(self.tr("Symboltable"))
 
         layout = QGridLayout()
         layout.addWidget(self.register_group, 0, 0, 1, 2)
-        layout.addWidget(self.storage_group, 1, 0, 1, 1)
-        layout.addWidget(self.symbol_group, 1, 1, 1, 1)
+        layout.addWidget(self.storage_group, 1, 0)
+        layout.addWidget(self.symbol_group, 1, 1)
+        layout.setSizeConstraint(layout.SetMaximumSize)
 
         self.setLayout(layout)
 
@@ -70,7 +72,7 @@ class EmulatorWidget(QWidget):
         self.register = []
 
         for i in range(32):
-            r = RegisterWidget('r' + str(i))
+            r = RegisterWidget('R' + str(i))
             self.register.append(r)
 
         self.register_layout = QHBoxLayout()
@@ -78,6 +80,8 @@ class EmulatorWidget(QWidget):
         self.register_layout.addWidget(self.register[self.index + 1])
         self.register_layout.addWidget(self.register[self.index + 2])
         self.register_layout.addWidget(self.register[self.index + 3])
+        self.register_layout.addWidget(self.register[self.index + 4])
+        self.register_layout.addWidget(self.register[self.index + 5])
 
         back = QPushButton()
         back.setIcon(QIcon("resources/back.png"))
@@ -97,7 +101,7 @@ class EmulatorWidget(QWidget):
         register_arrows_layout.addLayout(arrows_layout)
         register_arrows_layout.setAlignment(Qt.AlignTop)
 
-        self.program_counter = RegisterWidget('Pc')
+        self.program_counter = RegisterWidget("PC")
 
         register_group_layout = QVBoxLayout()
         register_group_layout.addLayout(register_arrows_layout)
@@ -107,29 +111,32 @@ class EmulatorWidget(QWidget):
 
     def __create_storage_group(self):
         self.storage = QPlainTextEdit()
-        self.storage.setFont(QFont('Sans serif', 8, QFont.Medium))
+        self.storage.setFont(QFont('Fira Code', 8, QFont.Medium))
 
         storage_layout = QVBoxLayout()
-        storage_layout.addWidget(self.storage)
 
+        storage_layout.addWidget(self.storage)
         self.storage_group.setLayout(storage_layout)
 
     def __create_symbol_group(self):
-        self.symbol = QPlainTextEdit()
-        self.symbol.setFont(QFont('Sans serif', 8, QFont.Medium))
+        self.symbol_layout = QFormLayout()
+        self.symbol_layout.setHorizontalSpacing(0)
+        self.symbol_layout.setVerticalSpacing(0)
+        self.symbol_layout.setLabelAlignment(Qt.AlignLeft)
+        self.symbol_layout.setFieldGrowthPolicy(
+            QFormLayout.AllNonFixedFieldsGrow)
+        self.symbol_layout.setFormAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        self.symbol_group.setLayout(self.symbol_layout)
 
-        symbol_layout = QVBoxLayout()
-        symbol_layout.addWidget(self.symbol)
-
-        self.symbol_group.setLayout(symbol_layout)
+        symbol = QLabel(self.tr("Symbol"))
+        self.symbol_layout.addRow(self.tr("Address"), symbol)
 
     @Slot()
     def __next_register(self):
-        if self.index == 28:
+        if self.index == 26:
             return
 
         self.index += 1
-
         self.__update_register()
 
     @Slot()
@@ -138,7 +145,6 @@ class EmulatorWidget(QWidget):
             return
 
         self.index -= 1
-
         self.__update_register()
 
     def __update_register(self):
@@ -149,6 +155,8 @@ class EmulatorWidget(QWidget):
         self.register_layout.addWidget(self.register[self.index + 1])
         self.register_layout.addWidget(self.register[self.index + 2])
         self.register_layout.addWidget(self.register[self.index + 3])
+        self.register_layout.addWidget(self.register[self.index + 4])
+        self.register_layout.addWidget(self.register[self.index + 5])
 
     def set_register(self, index, value):
         """Sets the value of a register chosen by its index"""
@@ -166,3 +174,18 @@ class EmulatorWidget(QWidget):
         """Sets the value of the storage"""
 
         self.storage.setPlainText(str(value))
+
+    def set_symbols(self, symboltable: dict):
+        """Fills the symboltable with parsed labels and addresses"""
+
+        font = QFont('Fira Code', 8, QFont.Medium)
+        for entry in symboltable:
+            symbol = QLineEdit()
+            symbol.setReadOnly(True)
+            symbol.setText(entry)
+            symbol.setFont(font)
+            address = QLineEdit()
+            address.setReadOnly(True)
+            address.setFont(font)
+            address.setText(str(symboltable[entry]))
+            self.symbol_layout.addRow(address, symbol)

@@ -37,9 +37,6 @@ class FooterDockWidget(QDockWidget):
         }
         """)
 
-    def get_widget(self):
-        return self.footer
-
 
 class FooterWidget(QWidget):
     """Footer widget"""

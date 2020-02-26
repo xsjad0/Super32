@@ -22,14 +22,14 @@ class EditorWidget(QWidget):
         self.setLayout(layout)
 
     def new_tab(self, title="", content=""):
-        """append new tab"""
+        """Append new tab"""
 
         EditorWidget.tab_count += 1
         editor = QPlainTextEdit()
         highlighter = SyntaxHighlighter(editor.document())
 
         editor.setFrameShape(QFrame.NoFrame)
-        editor.setFont(QFont("Fira Code", 12, QFont.Normal))
+        editor.setFont(QFont("Fira Code", 10, QFont.Normal))
         editor.setPlainText(content)
         tab_index = self.tabs.addTab(
             editor,
@@ -42,4 +42,5 @@ class EditorWidget(QWidget):
 
     @Slot()
     def __on_close_tab(self, index):
+        """Close tab on button-press"""
         self.tabs.removeTab(index)

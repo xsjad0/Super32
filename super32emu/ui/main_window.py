@@ -3,6 +3,7 @@ from PySide2.QtWidgets import QAction, QFileDialog, QMainWindow
 from PySide2.QtGui import QIcon, Qt, QKeySequence
 from PySide2.QtCore import Slot
 from super32utils.inout.fileio import FileIO
+from super32utils.inout.fileio import ResourceManager
 from logic.emulator import Emulator
 from .editor_widget import EditorWidget
 from .emulator_widget import EmulatorDockWidget
@@ -31,8 +32,8 @@ class MainWindow(QMainWindow):
 
         self.emulator = Emulator(
             self.editor_widget,
-            self.emulator_dock_widget.get_widget(),
-            self.footer_dock_widget.get_widget()
+            self.emulator_dock_widget.emulator,
+            self.footer_dock_widget.footer
         )
 
     def __create_menu(self):

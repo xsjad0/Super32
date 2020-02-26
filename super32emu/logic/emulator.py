@@ -1,3 +1,4 @@
+"""Emulator-Logic"""
 from super32assembler.assembler.assembler import Assembler
 from super32assembler.preprocessor.preprocessor import Preprocessor
 from super32assembler.assembler.architecture import Architectures
@@ -13,13 +14,18 @@ class Emulator():
         self.footer_widget = footer_widget
 
         for rindex in range(32):
-            self.emulator_widget.set_register(rindex, '00000000')
+            self.emulator_widget.set_register(rindex, '0000')
+
+        # FIXME: delete test-entries
+        for _ in range(10):
+            self.emulator_widget.set_symbols({"LOOP": "0008"})
 
         self.emulator_widget.set_pc(0)
         self.emulator_widget.set_storage(''.ljust(2**10, '0'))
 
         self.cfg = FileIO.read_json('instructionset.json')
         self.commands = self.cfg['commands']
+        self.memory = []
 
     def run(self):
         """Parse and execute the commands written in the editor"""
@@ -38,6 +44,7 @@ class Emulator():
             registers=self.cfg['registers'],
             symboltable=symboltable
         )
+        self.emulator_widget.set_symbols(symboltable)
 
         self.__emulate()
 
@@ -74,7 +81,7 @@ class Emulator():
                     instructionset[11:16],
                     instructionset[16:32])
 
-            self.program_counter += 1
+            self.program_counter += 1  # + 4 ?!
 
             self.emulator_widget.set_pc(self.program_counter)
             self.emulator_widget.set_storage(

@@ -3,6 +3,7 @@ from PySide2.QtCore import QRegExp
 
 
 class SyntaxHighlighter(QSyntaxHighlighter):
+    """Super32 Syntax-Highlighter"""
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -47,6 +48,7 @@ class SyntaxHighlighter(QSyntaxHighlighter):
         self.highlighting_rules.append((register_pattern, register_format))
 
     def highlightBlock(self, text):
+        """Check textblock wether to highlight or not"""
 
         for (pattern, style) in self.highlighting_rules:
             index = pattern.indexIn(text)
