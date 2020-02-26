@@ -2,9 +2,11 @@
 import sys
 from PySide2.QtWidgets import QApplication
 from ui.main_window import MainWindow
+from super32utils.settings.settings import Settings
 
 
 if __name__ == "__main__":
+    Settings.load()
     APP = QApplication(sys.argv)
 
     WIDGET = MainWindow()

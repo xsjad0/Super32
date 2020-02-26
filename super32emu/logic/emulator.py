@@ -3,6 +3,7 @@ from super32assembler.assembler.assembler import Assembler
 from super32assembler.preprocessor.preprocessor import Preprocessor
 from super32assembler.assembler.architecture import Architectures
 from super32utils.inout.fileio import FileIO
+from bitstring import BitArray
 
 
 class Emulator():
@@ -16,12 +17,9 @@ class Emulator():
         for rindex in range(32):
             self.emulator_widget.set_register(rindex, '0000')
 
-        # FIXME: delete test-entries
-        for _ in range(10):
-            self.emulator_widget.set_symbols({"LOOP": "0008"})
-
         self.emulator_widget.set_pc(0)
         self.emulator_widget.set_storage(''.ljust(2**10, '0'))
+        self.emulator_widget.set_symbols({"-": "-"})
 
         self.cfg = FileIO.read_json('instructionset.json')
         self.commands = self.cfg['commands']
@@ -34,7 +32,7 @@ class Emulator():
         assembler = Assembler(Architectures.SINGLE)
 
         code_address, code, zeros_constants, symboltable = preprocessor.parse(
-            input_file=self.editor_widget.get_text().split('\n')
+            input_file=self.editor_widget.get_text()
         )
         self.memory = assembler.parse(
             code_address=code_address,
@@ -52,10 +50,11 @@ class Emulator():
         self.emulator_widget.set_storage(
             ''.join(self.memory).ljust(2**10, '0'))
 
-        self.program_counter = 0
+        address_counter = 0
+        self.row_counter = 0
 
-        while self.program_counter < self.memory.__len__():
-            instructionset = self.memory[self.program_counter]
+        while self.row_counter < len(self.memory):
+            instructionset = self.memory[self.row_counter]
 
             instruction = instructionset[0:6]
 
@@ -79,11 +78,12 @@ class Emulator():
                 self.__save(
                     instructionset[6:11],
                     instructionset[11:16],
-                    instructionset[16:32])
+                    instructionset[16:31])
 
-            self.program_counter += 1  # + 4 ?!
+            self.row_counter += 1
+            address_counter = self.row_counter * 4
 
-            self.emulator_widget.set_pc(self.program_counter)
+            self.emulator_widget.set_pc(address_counter)
             self.emulator_widget.set_storage(
                 ''.join(self.memory).ljust(2**10, '0'))
 
@@ -109,14 +109,19 @@ class Emulator():
 
     def __branch(self, r2, r1, offset):
         if r2 == r1:
-            self.program_counter + int(offset, 2)
+            offset = BitArray(bin=offset).int
+            self.row_counter + offset - 1
 
     def __load(self, r2, r1, offset):
-        address = int(offset, 2) + int(r2, 2)
+        offset = BitArray(bin=offset).int
+        r2 = BitArray(bin=r2).int
+        address = offset + r2
         r1 = self.memory[address]
 
     def __save(self, r2, r1, offset):
-        address = int(offset, 2) + int(r2, 2)
+        offset = BitArray(bin=offset).int
+        r2 = BitArray(bin=r2).int
+        address = offset + r2
         self.memory[address] = r1
 
     def __get_register(self, target):

@@ -40,6 +40,10 @@ class EditorWidget(QWidget):
             self.tabs.setTabText(tab_index, title)
         self.tabs.setCurrentIndex(tab_index)
 
+    def get_text(self):
+        editor = self.tabs.currentWidget()
+        return editor.toPlainText().split("\n")
+
     @Slot()
     def __on_close_tab(self, index):
         """Close tab on button-press"""
