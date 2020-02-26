@@ -1,8 +1,7 @@
 """python emulator"""
 from PySide2.QtWidgets import QAction, QFileDialog, QMainWindow
 from PySide2.QtGui import QIcon, Qt, QKeySequence
-from PySide2.QtCore import Slot, Signal
-from super32utils.manager.resource_manager import ResourceManager
+from PySide2.QtCore import Slot
 from super32utils.inout.fileio import FileIO
 from logic.emulator import Emulator
 from .editor_widget import EditorWidget
@@ -119,7 +118,6 @@ class MainWindow(QMainWindow):
     @Slot()
     def __save(self):
         self.__saveas()
-
 
     @Slot()
     def __saveas(self):
